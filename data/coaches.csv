@@ -1,4 +1,4 @@
-coach_id,name,s1,s2,s3,p1,p2,p3,mon-ts1,tues-t1,wed-ts1,thu-ts1,fri-t1,mon-ts2,tues-t2,wed-ts2,thu-ts2,fri-t2,mon-ts3,tues-t3,wed-ts3,thu-ts3,fri-t3,mon-ts4,tues-t4,wed-ts4,thu-ts4,fri-t4,mon-ts5,tues-t5,wed-ts5,thu-ts5,fri-t5
-1,Taylor T.,1,0,0,1,0,1,1,0,1,1,0,0,1,0,0,0,1,0,0,1,1,0,0,1,0,1,1,1,0,1,0
-2,Cianna P.,0,1,0,1,1,0,0,1,0,0,1,0,0,1,0,1,0,1,0,1,1,1,1,0,1,0,1,0,1,1,1
-3,Maya D.,0,0,1,0,0,1,0,0,1,1,0,1,1,0,1,0,1,0,1,0,1,0,0,1,1,0,1,1,0,0,0
+coach_id,name,studios,programs,monday,tuesday,wednesday,thursday,friday,saturday,sunday
+1,Taylor T.,s1,"p1,p3","t1,t2,t3",t2,t4,"t2,t3,t4",t5,t3,"t1,t2"
+2,Cianna P.,s2,"p1,p2",t3,"t1,t4,t5",t2,t5,"t1,t2,t3","t4,t5","t3,t4"
+3,Maya D.,s3,p3,"t4,t5",t3,"t1,t3,t5",t1,t4,"t1,t2,t5",t5
