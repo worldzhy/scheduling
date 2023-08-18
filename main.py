@@ -1,5 +1,5 @@
 from ortools.sat.python import cp_model
-
+import csv
 
 # EXAMPLE DATA
 ## Array of data (manually list for now)
@@ -14,11 +14,16 @@ coaches_skills = {}
 for c in all_coaches:
     for p in all_programs:
         coaches_skills[(c, p)] = 0
-coaches_skills[('Taylor T.', 'Full Body (center glutes & triceps)')] = 1
-coaches_skills[('Taylor T.', 'Buns + Abs')] = 1
-coaches_skills[('Cianna P.', 'Full Body (hamstrings & biceps)')] = 1
-coaches_skills[('Cianna P.', 'Full Body (center glutes & triceps)')] = 1
-coaches_skills[('Maya D.', 'Buns + Abs')] = 1
+# LOAD DATA
+with open('data/coaches.csv', 'r') as csv_file:
+    coach_data = csv.DictReader(csv_file)
+    for coach in coach_data:
+        if coach['p1'] == '1':
+            coaches_skills[(coach['name'], 'Full Body (center glutes & triceps)')] = 1
+        if coach['p2'] == '1':
+            coaches_skills[(coach['name'], 'Full Body (hamstrings & biceps)')] = 1
+        if coach['p3'] == '1':
+            coaches_skills[(coach['name'], 'Buns + Abs')] = 1
 
 ## Coach availability (manually list for now)
 coaches_availability = {}
