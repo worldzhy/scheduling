@@ -2,9 +2,9 @@ from ortools.sat.python import cp_model
 
 
 # EXAMPLE DATA
-## Array of data
+## Array of data (manually list for now)
 all_studios = ['Culver City', 'Hollywood', 'Pasedena']
-all_days = [1, 2]
+all_days = ['Monday']
 all_timeslots = ['6:00am - 6:50am', '7:00am - 7:50am', '8:00am - 8:50am', '9:00am - 9:50am', '10:00am - 10:50am']
 all_programs = ['Full Body (center glutes & triceps)', 'Full Body (hamstrings & biceps)', 'Buns + Abs']
 all_coaches = ['Taylor T.', 'Cianna P.', 'Maya D.']
@@ -19,6 +19,32 @@ coaches_skills[('Taylor T.', 'Buns + Abs')] = 1
 coaches_skills[('Cianna P.', 'Full Body (hamstrings & biceps)')] = 1
 coaches_skills[('Cianna P.', 'Full Body (center glutes & triceps)')] = 1
 coaches_skills[('Maya D.', 'Buns + Abs')] = 1
+
+## Coach availability (manually list for now)
+coaches_availability = {}
+for c in all_coaches:
+    for s in all_studios:
+        for d in all_days:
+            for t in all_timeslots:
+                coaches_availability[(c, s, d, t)] = 0
+coaches_availability[('Taylor T.', 'Culver City', 'Monday', '6:00am - 6:50am')] = 1
+coaches_availability[('Taylor T.', 'Culver City', 'Monday', '8:00am - 8:50am')] = 1
+coaches_availability[('Taylor T.', 'Culver City', 'Monday', '9:00am - 9:50am')] = 1
+coaches_availability[('Taylor T.', 'Hollywood', 'Monday', '7:00am - 7:50am')] = 1
+coaches_availability[('Taylor T.', 'Pasedena', 'Monday', '6:00am - 6:50am')] = 1
+coaches_availability[('Cianna P.', 'Culver City', 'Monday', '7:00am - 7:50am')] = 1
+coaches_availability[('Cianna P.', 'Culver City', 'Monday', '9:00am - 9:50am')] = 1
+coaches_availability[('Cianna P.', 'Hollywood', 'Monday', '8:00am - 8:50am')] = 1
+coaches_availability[('Cianna P.', 'Hollywood', 'Monday', '9:00am - 9:50am')] = 1
+coaches_availability[('Cianna P.', 'Pasedena', 'Monday', '8:00am - 8:50am')] = 1
+coaches_availability[('Cianna P.', 'Pasedena', 'Monday', '9:00am - 9:50am')] = 1
+coaches_availability[('Maya D.', 'Culver City', 'Monday', '6:00am - 6:50am')] = 1
+coaches_availability[('Maya D.', 'Culver City', 'Monday', '10:00am - 10:50am')] = 1
+coaches_availability[('Maya D.', 'Hollywood', 'Monday', '6:00am - 6:50am')] = 1
+coaches_availability[('Maya D.', 'Hollywood', 'Monday', '6:00am - 6:50am')] = 1
+coaches_availability[('Maya D.', 'Hollywood', 'Monday', '10:00am - 10:50am')] = 1
+coaches_availability[('Maya D.', 'Pasedena', 'Monday', '7:00am - 7:50am')] = 1
+coaches_availability[('Maya D.', 'Pasedena', 'Monday', '10:00am - 10:50am')] = 1
 
 
 # CREATE MODEL
@@ -53,6 +79,15 @@ for s in all_studios:
                     if coaches_skills[(c, p)] == 0:
                         model.Add(schedule[(s, d, t, p, c)] == 0)
 
+## Coaches should only be assigned schedules they are available for
+for s in all_studios:
+    for d in all_days:
+        for t in all_timeslots:
+            for p in all_programs:
+                for c in all_coaches:
+                    if coaches_availability[(c, s, d, t)] == 0:
+                        model.Add(schedule[(s, d, t, p, c)] == 0)
+
 # CREATE SOLVER
 solver = cp_model.CpSolver()
 solver.parameters.linearization_level = 0
@@ -81,7 +116,7 @@ class SchedulePartialSolutionPrinter(cp_model.CpSolverSolutionCallback):
         for s in self._all_studios:
             print(f"  Studio: {s}")
             for d in self._all_days:
-                print(f"    Day {d}")
+                print(f"    {d}")
                 for t in self._all_timeslots:
                     for p in self._all_programs:
                         for c in self._all_coaches:
@@ -96,7 +131,7 @@ class SchedulePartialSolutionPrinter(cp_model.CpSolverSolutionCallback):
 
 
 # CONFIGURE SOLUTION DISPLAY
-solution_limit = 2
+solution_limit = 1
 solution_printer = SchedulePartialSolutionPrinter(
     schedule,
     all_studios,
