@@ -9,6 +9,17 @@ all_timeslots = ['6:00am - 6:50am', '7:00am - 7:50am', '8:00am - 8:50am', '9:00a
 all_programs = ['Full Body (center glutes & triceps)', 'Full Body (hamstrings & biceps)', 'Buns + Abs']
 all_coaches = ['Taylor T.', 'Cianna P.', 'Maya D.']
 
+## Coach skills (manually list for now)
+coaches_skills = {}
+for c in all_coaches:
+    for p in all_programs:
+        coaches_skills[(c, p)] = 0
+coaches_skills[('Taylor T.', 'Full Body (center glutes & triceps)')] = 1
+coaches_skills[('Taylor T.', 'Buns + Abs')] = 1
+coaches_skills[('Cianna P.', 'Full Body (hamstrings & biceps)')] = 1
+coaches_skills[('Cianna P.', 'Full Body (center glutes & triceps)')] = 1
+coaches_skills[('Maya D.', 'Buns + Abs')] = 1
+
 
 # CREATE MODEL
 model = cp_model.CpModel()
@@ -32,6 +43,15 @@ for s in all_studios:
     for d in all_days:
         for t in all_timeslots:
             model.AddExactlyOne(schedule[(s, d, t, p, c)] for p in all_programs for c in all_coaches)
+
+## Coaches should only be assigned programs they are qualified for
+for s in all_studios:
+    for d in all_days:
+        for t in all_timeslots:
+            for p in all_programs:
+                for c in all_coaches:
+                    if coaches_skills[(c, p)] == 0:
+                        model.Add(schedule[(s, d, t, p, c)] == 0)
 
 # CREATE SOLVER
 solver = cp_model.CpSolver()
