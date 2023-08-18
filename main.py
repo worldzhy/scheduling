@@ -3,11 +3,9 @@ import csv
 
 # DATA
 ## Array of data (manually list for now)
-all_studios = ['Culver City', 'Hollywood', 'Pasedena']
-all_days = ['Monday']
-# all_days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
-all_timeslots = ['6:00am - 6:50am', '7:00am - 7:50am', '8:00am - 8:50am', '9:00am - 9:50am', '10:00am - 10:50am']
-# all_timeslots = ['t1', 't2', 't3', 't4', 't5']
+all_studios = ['s1', 's2', 's3']
+all_days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+all_timeslots = ['t1', 't2', 't3', 't4', 't5']
 all_programs = ['p1', 'p2', 'p3']
 all_coaches = ['Taylor T.', 'Cianna P.', 'Maya D.']
 
@@ -30,24 +28,32 @@ for c in all_coaches:
         for d in all_days:
             for t in all_timeslots:
                 coaches_availability[(c, s, d, t)] = 0
-coaches_availability[('Taylor T.', 'Culver City', 'Monday', '6:00am - 6:50am')] = 1
-coaches_availability[('Taylor T.', 'Culver City', 'Monday', '8:00am - 8:50am')] = 1
-coaches_availability[('Taylor T.', 'Culver City', 'Monday', '9:00am - 9:50am')] = 1
-coaches_availability[('Taylor T.', 'Hollywood', 'Monday', '7:00am - 7:50am')] = 1
-coaches_availability[('Taylor T.', 'Pasedena', 'Monday', '6:00am - 6:50am')] = 1
-coaches_availability[('Cianna P.', 'Culver City', 'Monday', '7:00am - 7:50am')] = 1
-coaches_availability[('Cianna P.', 'Culver City', 'Monday', '9:00am - 9:50am')] = 1
-coaches_availability[('Cianna P.', 'Hollywood', 'Monday', '8:00am - 8:50am')] = 1
-coaches_availability[('Cianna P.', 'Hollywood', 'Monday', '9:00am - 9:50am')] = 1
-coaches_availability[('Cianna P.', 'Pasedena', 'Monday', '8:00am - 8:50am')] = 1
-coaches_availability[('Cianna P.', 'Pasedena', 'Monday', '9:00am - 9:50am')] = 1
-coaches_availability[('Maya D.', 'Culver City', 'Monday', '6:00am - 6:50am')] = 1
-coaches_availability[('Maya D.', 'Culver City', 'Monday', '10:00am - 10:50am')] = 1
-coaches_availability[('Maya D.', 'Hollywood', 'Monday', '6:00am - 6:50am')] = 1
-coaches_availability[('Maya D.', 'Hollywood', 'Monday', '6:00am - 6:50am')] = 1
-coaches_availability[('Maya D.', 'Hollywood', 'Monday', '10:00am - 10:50am')] = 1
-coaches_availability[('Maya D.', 'Pasedena', 'Monday', '7:00am - 7:50am')] = 1
-coaches_availability[('Maya D.', 'Pasedena', 'Monday', '10:00am - 10:50am')] = 1
+with open('data/coaches.csv', 'r') as csv_file:
+    coach_data = csv.DictReader(csv_file)
+    for coach in coach_data:
+        for s in coach['studios'].split(','):
+            for t in coach['monday'].split(','):
+                if s in all_studios and t in all_timeslots:
+                    coaches_availability[(coach['name'], s, 'monday', t)] = 1
+            for t in coach['tuesday'].split(','):
+                if s in all_studios and t in all_timeslots:
+                    coaches_availability[(coach['name'], s, 'tuesday', t)] = 1
+            for t in coach['wednesday'].split(','):
+                if s in all_studios and t in all_timeslots:
+                    coaches_availability[(coach['name'], s, 'wednesday', t)] = 1
+            for t in coach['thursday'].split(','):
+                if s in all_studios and t in all_timeslots:
+                    coaches_availability[(coach['name'], s, 'thursday', t)] = 1
+            for t in coach['friday'].split(','):
+                if s in all_studios and t in all_timeslots:
+                    coaches_availability[(coach['name'], s, 'friday', t)] = 1
+            for t in coach['saturday'].split(','):
+                if s in all_studios and t in all_timeslots:
+                    coaches_availability[(coach['name'], s, 'saturday', t)] = 1
+            for t in coach['sunday'].split(','):
+                if s in all_studios and t in all_timeslots:
+                    coaches_availability[(coach['name'], s, 'sunday', t)] = 1
+
 
 
 # CREATE MODEL
