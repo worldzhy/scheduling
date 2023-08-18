@@ -2,16 +2,12 @@ from ortools.sat.python import cp_model
 
 
 # EXAMPLE DATA
-num_studios = 1
-num_days = 2
-num_timeslots = 2
-num_programs = 3
-num_coaches = 3
-all_studios = range(num_studios)
-all_days = range(num_days)
-all_timeslots = range(num_timeslots)
-all_programs = range(num_programs)
-all_coaches = range(num_coaches)
+## Array of data
+all_studios = ['Culver City', 'Hollywood', 'Pasedena']
+all_days = [1, 2]
+all_timeslots = ['6:00am - 6:50am', '7:00am - 7:50am', '8:00am - 8:50am', '9:00am - 9:50am', '10:00am - 10:50am']
+all_programs = ['Full Body (center glutes & triceps)', 'Full Body (hamstrings & biceps)', 'Buns + Abs']
+all_coaches = ['Taylor T.', 'Cianna P.', 'Maya D.']
 
 
 # CREATE MODEL
@@ -47,29 +43,30 @@ solver.parameters.enumerate_all_solutions = True
 class SchedulePartialSolutionPrinter(cp_model.CpSolverSolutionCallback):
     """Print intermediate solutions."""
 
-    def __init__(self, schedule, num_studios, num_days, num_timeslots, num_programs, num_coaches, limit):
+    def __init__(self, schedule, all_studios, all_days, all_timeslots, all_programs, all_coaches, limit):
         cp_model.CpSolverSolutionCallback.__init__(self)
         self._schedule = schedule
-        self._num_studios = num_studios
-        self._num_days = num_days
-        self._num_timeslots = num_timeslots
-        self._num_programs = num_programs
-        self._num_coaches = num_coaches
+        self._all_studios = all_studios
+        self._all_days = all_days
+        self._all_timeslots = all_timeslots
+        self._all_programs = all_programs
+        self._all_coaches = all_coaches
         self._solution_count = 0
         self._solution_limit = limit
 
     def on_solution_callback(self):
         self._solution_count += 1
-        print(f">> Solution {self._solution_count}")
-        for s in range(self._num_studios):
-            print(f"Studio {s}")
-            for d in range(self._num_days):
-                print(f"  Day {d}")
-                for t in range(self._num_timeslots):
-                    for p in range(self._num_programs):
-                        for c in range(self._num_coaches):
+        print(">" * 100)
+        print(f"Solution {self._solution_count}")
+        for s in self._all_studios:
+            print(f"  Studio: {s}")
+            for d in self._all_days:
+                print(f"    Day {d}")
+                for t in self._all_timeslots:
+                    for p in self._all_programs:
+                        for c in self._all_coaches:
                             if self.Value(self._schedule[(s, d, t, p, c)]):
-                                print(f"    Timeslot {t}: Coach {c} to teach program {p}")
+                                print(f"      {t}: {c} to teach {p}")
         if self._solution_count >= self._solution_limit:
             print(f"Stop search after {self._solution_limit} solutions")
             self.StopSearch()
@@ -79,14 +76,14 @@ class SchedulePartialSolutionPrinter(cp_model.CpSolverSolutionCallback):
 
 
 # CONFIGURE SOLUTION DISPLAY
-solution_limit = 10
+solution_limit = 2
 solution_printer = SchedulePartialSolutionPrinter(
     schedule,
-    num_studios,
-    num_days,
-    num_timeslots,
-    num_programs,
-    num_coaches,
+    all_studios,
+    all_days,
+    all_timeslots,
+    all_programs,
+    all_coaches,
     solution_limit
 )
 
