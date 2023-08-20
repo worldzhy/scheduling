@@ -32,27 +32,10 @@ with open('data/coaches.csv', 'r') as csv_file:
     coach_data = csv.DictReader(csv_file)
     for coach in coach_data:
         for s in coach['studios'].split(','):
-            for t in coach['monday'].split(','):
-                if s in all_studios and t in all_timeslots:
-                    coaches_availability[(coach['name'], s, 'monday', t)] = 1
-            for t in coach['tuesday'].split(','):
-                if s in all_studios and t in all_timeslots:
-                    coaches_availability[(coach['name'], s, 'tuesday', t)] = 1
-            for t in coach['wednesday'].split(','):
-                if s in all_studios and t in all_timeslots:
-                    coaches_availability[(coach['name'], s, 'wednesday', t)] = 1
-            for t in coach['thursday'].split(','):
-                if s in all_studios and t in all_timeslots:
-                    coaches_availability[(coach['name'], s, 'thursday', t)] = 1
-            for t in coach['friday'].split(','):
-                if s in all_studios and t in all_timeslots:
-                    coaches_availability[(coach['name'], s, 'friday', t)] = 1
-            for t in coach['saturday'].split(','):
-                if s in all_studios and t in all_timeslots:
-                    coaches_availability[(coach['name'], s, 'saturday', t)] = 1
-            for t in coach['sunday'].split(','):
-                if s in all_studios and t in all_timeslots:
-                    coaches_availability[(coach['name'], s, 'sunday', t)] = 1
+            for d in all_days:
+                for t in coach[d].split(','):
+                    if s in all_studios and t in all_timeslots:
+                        coaches_availability[(coach['name'], s, d, t)] = 1
 
 
 
