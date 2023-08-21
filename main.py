@@ -7,19 +7,19 @@ all_studios = ['s1', 's2', 's3']
 all_days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 all_timeslots = ['t1', 't2', 't3', 't4', 't5']
 all_programs = ['p1', 'p2', 'p3']
-all_coaches = ['Taylor T.', 'Cianna P.', 'Maya D.']
+all_coaches = ['c1', 'c2', 'c3']
 
 ## Coach skills
 coaches_skills = {}
 for c in all_coaches:
     for p in all_programs:
         coaches_skills[(c, p)] = 0
-with open('data/coaches.csv', 'r') as csv_file:
+with open('data/constraints.csv', 'r') as csv_file:
     coach_data = csv.DictReader(csv_file)
     for coach in coach_data:
         for p in coach['programs'].split(','):
             if p in all_programs:
-                coaches_skills[(coach['name'], p)] = 1
+                coaches_skills[(coach['coach'], p)] = 1
 
 ## Coach availability (manually list for now)
 coaches_availability = {}
@@ -28,14 +28,14 @@ for c in all_coaches:
         for d in all_days:
             for t in all_timeslots:
                 coaches_availability[(c, s, d, t)] = 0
-with open('data/coaches.csv', 'r') as csv_file:
+with open('data/constraints.csv', 'r') as csv_file:
     coach_data = csv.DictReader(csv_file)
     for coach in coach_data:
         for s in coach['studios'].split(','):
             for d in all_days:
                 for t in coach[d].split(','):
                     if s in all_studios and t in all_timeslots:
-                        coaches_availability[(coach['name'], s, d, t)] = 1
+                        coaches_availability[(coach['coach'], s, d, t)] = 1
 
 
 
