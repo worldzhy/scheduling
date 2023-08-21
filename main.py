@@ -3,11 +3,40 @@ import csv
 
 # DATA
 ## Array of data (manually list for now)
-all_studios = ['s1', 's2', 's3']
 all_days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
-all_timeslots = ['t1', 't2', 't3', 't4', 't5']
-all_programs = ['p1', 'p2', 'p3']
-all_coaches = ['c1', 'c2', 'c3']
+all_studios = []
+all_timeslots = []
+all_programs = []
+all_coaches = []
+
+studios = {}
+timeslots = {}
+programs = {}
+coaches = {}
+
+with open('data/studios.csv', 'r') as csv_file:
+    data = csv.DictReader(csv_file)
+    for s in data:
+        all_studios.append(s['id'])
+        studios[(s['id'], 'name')] = s['name']
+
+with open('data/timeslots.csv', 'r') as csv_file:
+    data = csv.DictReader(csv_file)
+    for t in data:
+        all_timeslots.append(t['id'])
+        timeslots[(t['id'], 'name')] = t['name']
+
+with open('data/programs.csv', 'r') as csv_file:
+    data = csv.DictReader(csv_file)
+    for p in data:
+        all_programs.append(p['id'])
+        programs[(p['id'], 'name')] = p['name']
+
+with open('data/coaches.csv', 'r') as csv_file:
+    data = csv.DictReader(csv_file)
+    for c in data:
+        all_coaches.append(c['id'])
+        coaches[(c['id'], 'name')] = c['name']
 
 ## Coach skills
 coaches_skills = {}
@@ -106,14 +135,14 @@ class SchedulePartialSolutionPrinter(cp_model.CpSolverSolutionCallback):
         print(">" * 100)
         print(f"Solution {self._solution_count}")
         for s in self._all_studios:
-            print(f"  Studio: {s}")
+            print(f"  Studio: {studios[(s, 'name')]}")
             for d in self._all_days:
                 print(f"    {d}")
                 for t in self._all_timeslots:
                     for p in self._all_programs:
                         for c in self._all_coaches:
                             if self.Value(self._schedule[(s, d, t, p, c)]):
-                                print(f"      {t}: {c} to teach {p}")
+                                print(f"      {timeslots[(t, 'name')]}: {coaches[(c, 'name')]} to teach {programs[(p, 'name')]}")
         if self._solution_count >= self._solution_limit:
             print(f"Stop search after {self._solution_limit} solutions")
             self.StopSearch()
