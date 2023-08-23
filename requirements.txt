@@ -1,2 +1,5 @@
 ortools
 pandas
+matplotlib
+scipy
+scikit-learn
