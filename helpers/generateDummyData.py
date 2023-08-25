@@ -5,7 +5,7 @@ np.random.seed(42)  # For reproducibility
 
 # Generate random test data
 num_samples = 100000
-days = [1, 2, 3, 4, 5, 6, 7]
+days = ['d1', 'd2', 'd3', 'd4', 'd5', 'd6', 'd7']
 programs = [f'p{i}' for i in range(101, 108)]
 coaches = [f'c{i}' for i in range(201, 208)]
 studios = [f's{i}' for i in range(1, 8)]
@@ -25,4 +25,4 @@ random_data = {
 test_data_df = pd.DataFrame(random_data)
 
 # Save the random test data to a CSV file
-test_data_df.to_csv('data/utilization.csv', index=False)
+test_data_df.to_csv('data/capacity.csv', index=False)
