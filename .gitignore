@@ -1,3 +1,6 @@
-*.out
+# Proprietary Mac/OSX system file
 .DS_Store
-data/tables/*
+# Test output files
+*.out
+# Raw data (files too large)
+data/raw/*
