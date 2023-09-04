@@ -1,21 +1,11 @@
 # Imports
 from random import choices, uniform, randint
+from typing import List, Type, TypeVar
 from collections import namedtuple
+from helpers import load_data
 
-# Define items
-Thing = namedtuple('Thing', ['name', 'value', 'weight'])
-items = [
-    Thing('Laptop', 500, 2200),
-    Thing('Headphones', 150, 160),
-    Thing('Water Bottle', 30, 192),
-    Thing('Mints', 5, 25),
-    Thing('Socks', 10, 38),
-    Thing('Tissues', 15, 80),
-    Thing('Phone', 500, 200),
-    Thing('Baseball Cap', 100, 70),
-    Thing('Coffee Mug', 60, 350),
-    Thing('Notepad', 40, 333),
-]
+# Load data
+studios, programs, coaches, days = load_data()
 
 # Genetic representation of solution
 def generate_genome():
@@ -110,4 +100,4 @@ def main():
             total_w = total_w + items[index].weight
             total_v = total_v + items[index].value
     print(f'weight: {total_w}; value: {total_v}; fitness: {calculate_fitness(best[0])}')
-main()
+# main()
