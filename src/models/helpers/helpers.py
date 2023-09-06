@@ -1,19 +1,29 @@
 # Imports
-from typing import List, Type, TypeVar
-from collections import namedtuple
+from typing import List, NamedTuple, Type, TypeVar
 import csv
 
 # Types
-Studios = namedtuple('Studios', ['id', 'name'])
-Programs = namedtuple('Programs', ['id', 'name'])
-Coaches = namedtuple('Coaches', ['id', 'name'])
-Days = namedtuple('Days', ['id', 'name'])
+class Studios(NamedTuple):
+        id: str
+        name: str
+
+class Programs(NamedTuple):
+        id: str
+        name: str
+
+class Coaches(NamedTuple):
+        id: str
+        name: str
+
+class Days(NamedTuple):
+        id: str
+        name: str
 
 # Helper functions
 def load_data():
     T = TypeVar('T')
     def get_data(set_type: Type[T], set_name: str) -> List[T]:
-        ret = []
+        ret: List[T] = []
         if set_name == 'days':
             for day in range(30):
                 ret.append(set_type('D' + str(day), day))

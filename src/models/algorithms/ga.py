@@ -1,8 +1,8 @@
 # Imports
-from typing import List, Callable, Tuple
+from typing import List, Callable, Tuple, Union
 
 # Genome
-Genome = List[int]
+Genome = List[Union[str, int]]
 # Population
 Population = List[Genome]
 # Creates initial population
