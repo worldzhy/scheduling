@@ -1,103 +1,63 @@
 # Imports
-from random import choices, uniform, randint
-from typing import List, Type, TypeVar
-from collections import namedtuple
-from helpers import load_data
+from typing import List, Callable, Tuple
 
-# Load data
-studios, programs, coaches, days = load_data()
+# Genome
+Genome = List[int]
+# Population
+Population = List[Genome]
+# Creates initial population
+PopulateFunc = Callable[[int], Population]
+# Calculates the fitness of a genome
+FitnessFunc = Callable[[Genome], int]
+# Chooses the parents for the next generation
+SelectionFunc = Callable[[Population, FitnessFunc], Tuple[Genome, Genome]]
+# Generates offsprings from parents
+CrossoverFunc = Callable[[Tuple[Genome, Genome]], Tuple[Genome, Genome]]
+# Applys mutation to the genome
+MutationFunc = Callable[[Genome], Genome]
+# Function for printing purposes
+PrinterFunc = Callable[[Population, FitnessFunc, int], None]
 
-# Genetic representation of solution
-def generate_genome():
-    return choices([0, 1], k = len(items))
-    
-# A function to generate new solution
-def generate_population(pop_size):
-    return [generate_genome() for _ in range(pop_size)]
+# Default printing function
+def print_stats(population: Population, fitness_func: FitnessFunc, generation_id: int) -> None:
+    sorted_population = sorted(population, key=fitness_func, reverse=True)
+    avg_fitness = sum([fitness_func(genome) for genome in population]) / len(population)
+    best_fitness = fitness_func(sorted_population[0])
+    worst_fitness = fitness_func(sorted_population[-1])
+    print(f'GENERATION {generation_id}')
+    print("=================")
+    print(f'Avg. Fitness: {avg_fitness}')
+    print(f'Best. Fitness: {best_fitness}')
+    print(f'Worst. Fitness: {worst_fitness}')
+    print("")
 
-# Fitness function
-def calculate_fitness(genome):
-    value = 0
-    weight = 0
-    for index, item in enumerate(items):
-        value = value + item.value * genome[index]
-        weight = weight + item.weight * genome[index]
-        if weight > 3000:
-            return 0
-    return value
-
-# Selection function
-def selection(population):
-    return choices(
-        population=population,
-        weights=[calculate_fitness(genome) for genome in population],
-        k=2
-    )
-
-# Crossover function
-def crossover(parents):
-    genome1 = parents[0]
-    genome2 = parents[1]
-    point = randint(0, len(genome1))
-    genome1A = genome1[:point]
-    genome1B = genome1[point:]
-    genome2A = genome2[:point]
-    genome2B = genome2[point:]
-    return genome1A + genome2B, genome1B + genome2A
-
-
-# Mutation function
-def mutation(genome):
-    for index, gen in enumerate(genome):
-        if (uniform(0, 1) > 0.3):
-            genome[index] = abs(gen - 1)
-    return genome
-
-# Elitism
-def get_elites(pop, k=2):
-    return sorted(
-        pop,
-        key=lambda genome: calculate_fitness(genome),
-        reverse=True
-    )[:k]
-
-def main():
-    # Parameters
-    NUM_ITER = 1000
-    POPULATION_NUM = 10
-
-    # Initialize
-    population = generate_population(POPULATION_NUM)
-
-    # Run
-    for iter in range(NUM_ITER):
-        ### Print
-        best = get_elites(population, 1)
-        print(f'Iteration #: {iter} (fitness: {calculate_fitness(best[0])})')
-
-        ### Begin next iteration
-        # Prepare to generate population
-        current_population = []
-        # Add elites in population
-        current_population += get_elites(population)
-        # Select parents
-        parents = selection(population)
-        # Perform crossover
-        for _ in range(int(POPULATION_NUM / 2 ) - 1):
-            a, b = crossover(parents)
-            a = mutation(a)
-            b = mutation(b)
-            current_population += [a, b]
-        # Replace old population
-        population = current_population
-
-    best = get_elites(population, 1)
-    total_w = 0
-    total_v = 0
-    for index,item in enumerate(best[0]):
-        if item == 1:
-            print(items[index].name)
-            total_w = total_w + items[index].weight
-            total_v = total_v + items[index].value
-    print(f'weight: {total_w}; value: {total_v}; fitness: {calculate_fitness(best[0])}')
-# main()
+# Genetic Algorithm Model
+def run_ga(
+    populate_func: PopulateFunc,
+    fitness_func: FitnessFunc,
+    selection_func: SelectionFunc,
+    crossover_func: CrossoverFunc,
+    mutation_func: MutationFunc,
+    printer_func: PrinterFunc = print_stats,
+    max_fitness: int = 1000000,
+    max_iteration: int = 1000,
+    population_size: int = 10
+):
+    population: Population = populate_func(population_size)
+    for i in range(max_iteration):
+        printer_func(population, fitness_func, i)
+        population = sorted(
+            population,
+            key=lambda genome: fitness_func(genome),
+            reverse=True
+        )
+        if fitness_func(population[0]) >= max_fitness:
+            break
+        next_generation = population[0:2]
+        for _ in range(int(population_size / 2 ) - 1):
+            parents = selection_func(population, fitness_func)
+            offspring_a, offspring_b = crossover_func(parents)
+            offspring_a = mutation_func(offspring_a)
+            offspring_b = mutation_func(offspring_b)
+            next_generation += [offspring_a, offspring_b]
+        population = next_generation
