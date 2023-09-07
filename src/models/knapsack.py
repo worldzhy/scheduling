@@ -64,9 +64,9 @@ def crossover_func(parents: Tuple[Genome, Genome]) -> Tuple[Genome, Genome]:
     return genome1A + genome2B, genome1B + genome2A
 
 # Mutation function
-def mutation_func(genome: Genome) -> Genome:
+def mutation_func(genome: Genome, mutation_rate: float) -> Genome:
     for index, gen in enumerate(genome):
-        if (uniform(0, 1) > 0.3):
+        if (uniform(0, 1) > mutation_rate):
             genome[index] = abs(gen - 1)
     return genome
 

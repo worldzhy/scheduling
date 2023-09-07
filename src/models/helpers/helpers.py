@@ -1,6 +1,6 @@
 import csv
 from typing import List, Type, TypeVar
-from helpers.types import Studio, Program, Coach, Day, Class, Qualification
+from helpers.Type import Studio, Program, Coach, Day, Course, CourseWithSchedule, Qualification
 
 # Helper functions
 def load_data():
@@ -10,6 +10,11 @@ def load_data():
         if set_name == 'days':
             for day in range(30):
                 ret.append(set_type('D' + str(day), day))
+        elif set_name == 'programs':
+            with open(f'data/processed/programs.csv', 'r') as csv_file:
+                data = csv.DictReader(csv_file)
+                for row in data:
+                    ret.append(set_type(row['id'], row['name'], row['duration']))
         else: 
             with open(f'data/processed/{set_name}.csv', 'r') as csv_file:
                 data = csv.DictReader(csv_file)
@@ -18,12 +23,12 @@ def load_data():
         return ret
     return get_data(Studio, 'studios'), get_data(Program, 'programs'), get_data(Coach, 'coaches'), get_data(Day, 'days')
 
-def get_choices(programs: List[Program], coaches: List[Coach]) -> List[Class]:
-    choices: List[Class] = []
-    choices.append(Class(None, None))
+def get_choices(programs: List[Program], coaches: List[Coach]) -> List[Course]:
+    choices: List[Course] = []
+    choices.append(Course(None, None))
     for p in programs:
         for c in coaches:
-            choices.append(Class(p.id, c.id))
+            choices.append(Course(p.id, c.id))
     return choices
 
 def get_qualifications(programs: List[Program], coaches: List[Coach]) -> List[Qualification]:
@@ -41,3 +46,23 @@ def get_qualifications(programs: List[Program], coaches: List[Coach]) -> List[Qu
                         if p in programIds:
                                 ret.append(Qualification(p, row['coach'], True))
     return ret
+
+def create_schedule(course: Course, start_time: int, end_time: int, resolution: int) -> CourseWithSchedule:
+        duration = (end_time - start_time) * resolution
+        return CourseWithSchedule(course, start_time, end_time, duration)
+
+def schedulize(courses: List[Course], resolution: int) -> List[CourseWithSchedule]:
+    results: List[CourseWithSchedule] = []
+    prev_course: Course = courses[0] 
+    start_time: int = 0
+
+    for i, current_course in enumerate(courses):
+        if i != 0 and (prev_course.programId != current_course.programId or prev_course.coachId != current_course.coachId):
+             results.append(create_schedule(prev_course, start_time, i, resolution))
+             start_time = i
+             prev_course = current_course
+    
+    # Add last interval
+    results.append(create_schedule(prev_course, start_time, len(courses), resolution))
+
+    return results

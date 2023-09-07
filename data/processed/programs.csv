@@ -1,4 +1,4 @@
-id,name
-p1,Full Body (center glutes & triceps)
-p2,Full Body (hamstrings & biceps)
-p3,Buns + Abs
+id,name,duration
+p1,Full Body (center glutes & triceps),65
+p2,Full Body (hamstrings & biceps),50
+p3,Buns + Abs,30

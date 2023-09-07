@@ -2,8 +2,8 @@
 from random import choices, uniform, randint
 from typing import Any, Callable, Tuple, cast
 from algorithms.ga import GeneticAlgorithm
-from helpers.helpers import load_data, get_choices, get_qualifications
-from helpers.types import Genome, Population, Class
+from helpers.helpers import load_data, get_choices, get_qualifications, schedulize
+from helpers.Type import Genome, Population, Program, Course
 from helpers.constants import Constant
 
 ## Data
@@ -11,26 +11,39 @@ studios, programs, coaches, days = load_data()
 qualifications = get_qualifications(programs, coaches)
 choices_list = get_choices(programs, coaches)
 
+## Helpers
+def get_program_by_id (programId: str) -> Program | None:
+    targetProgram: Program | None = None
+    for program in programs:
+        if program.id == programId:
+            targetProgram = program
+            break
+    return targetProgram
+
 # Population function
 def populate_func(population_size: int) -> Population:
     return [choices(cast(Any, choices_list), k = int(Constant.SLOTS_PER_DAY_NUM) * Constant.DAYS_NUM) for _ in range(population_size)]
 
 # Fitness function
-# def fitness_func(genome: Genome) -> int:
-#     value = 0
-#     weight = 0
-#     for index, item in enumerate(items):
-#         value = value + item.value * genome[index]
-#         weight = weight + item.weight * genome[index]
-#         if weight > 3000:
-#             return 0
-#     return value
+def fitness_func(genome: Genome) -> int:
+    schedule = schedulize(genome, Constant.RESOLUTION_IN_MINUTES)
+    value = 0
+    for _, course in enumerate(schedule):
+        if course.course.programId is not None:
+            program = get_program_by_id(course.course.programId)
+            if program is not None and course.duration != program.duration:
+                value = 0
+                break
+            else:
+                value = value + 1
+    return value
 
 # Selection function
 def selection_func(population: Population, calc_fitness: Callable[[Genome], int]) -> Tuple[Genome, Genome]:
+    custom_weights = [calc_fitness(genome) for genome in population]
     selected = choices(
         population = population,
-        weights = [calc_fitness(genome) for genome in population],
+        weights = custom_weights if sum(custom_weights) > 0 else None,
         k = 2
     )
     return selected[0], selected[1]
@@ -47,17 +60,19 @@ def crossover_func(parents: Tuple[Genome, Genome]) -> Tuple[Genome, Genome]:
     return genome1A + genome2B, genome1B + genome2A
 
 # Mutation function
-def mutation_func(genome: Genome) -> Genome:
+def mutation_func(genome: Genome, mutation_rate: float) -> Genome:
     for i, _ in enumerate(genome):
-        if (uniform(0, 1) > 0.2):
+        if (uniform(0, 1) > mutation_rate):
             genome[i] = choices(choices_list, k = 1)[0]
     return genome
 
 # Run model
-# GeneticAlgorithm[Class](
-#     populate_func,
-#     fitness_func,
-#     selection_func,
-#     crossover_func,
-#     mutation_func
-# ).run()
+GeneticAlgorithm[Course](
+    populate_func,
+    fitness_func,
+    selection_func,
+    crossover_func,
+    mutation_func
+).run(mutation_rate=0.5, population_size=100)
+
+# print(selection_func(populate_func(5), fitness_func))

@@ -10,6 +10,7 @@ class Studio(NamedTuple):
 class Program(NamedTuple):
         id: str
         name: str
+        duration: int
 
 class Coach(NamedTuple):
         id: str
@@ -21,9 +22,15 @@ class Day(NamedTuple):
 
 ## Compounded Type
 
-class Class(NamedTuple):
+class Course(NamedTuple):
     programId: Union[str, None]
     coachId: Union[str, None]
+
+class CourseWithSchedule(NamedTuple):
+    course: Course
+    start_time: int
+    end_time: int
+    duration: int
 
 class Qualification(NamedTuple):
     programId: str
@@ -32,6 +39,6 @@ class Qualification(NamedTuple):
 
 ## Genetic Algorithm Representation
 
-Genome = List[Class]
+Genome = List[Course]
 
 Population = List[Genome]
