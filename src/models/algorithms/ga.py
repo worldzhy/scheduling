@@ -6,11 +6,11 @@ class GeneticAlgorithm(Generic[T]):
     def __init__(
         self,
         populate_func: Callable[[int], List[List[T]]],
-        fitness_func: Callable[[List[T]], int],
-        selection_func: Callable[[List[List[T]], Callable[[List[T]], int]], Tuple[List[T], List[T]]],
+        fitness_func: Callable[[List[T]], float],
+        selection_func: Callable[[List[List[T]], Callable[[List[T]], float]], Tuple[List[T], List[T]]],
         crossover_func: Callable[[Tuple[List[T], List[T]]], Tuple[List[T], List[T]]],
         mutation_func: Callable[[List[T], float], List[T]],
-        printer_func: Union[Callable[[List[List[T]], Callable[[List[T]], int], int], None], None] = None,
+        printer_func: Union[Callable[[List[List[T]], Callable[[List[T]], float], int], None], None] = None,
     ):
         self._populate_func = populate_func
         self._fitness_func = fitness_func
@@ -42,7 +42,7 @@ class GeneticAlgorithm(Generic[T]):
                 next_generation += [offspring_a, offspring_b]
             population = next_generation
 
-    def _printer_default(self, population: List[List[T]], fitness_func: Callable[[List[T]], int], generation_id: int) -> None:
+    def _printer_default(self, population: List[List[T]], fitness_func: Callable[[List[T]], float], generation_id: int) -> None:
         sorted_population = sorted(population, key=fitness_func, reverse=True)
         avg_fitness = sum([fitness_func(genome) for genome in population]) / len(population)
         best_fitness = fitness_func(sorted_population[0])

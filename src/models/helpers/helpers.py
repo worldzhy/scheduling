@@ -14,7 +14,7 @@ def load_data():
             with open(f'data/processed/programs.csv', 'r') as csv_file:
                 data = csv.DictReader(csv_file)
                 for row in data:
-                    ret.append(set_type(row['id'], row['name'], row['duration']))
+                    ret.append(set_type(row['id'], row['name'], int(row['duration'])))
         else: 
             with open(f'data/processed/{set_name}.csv', 'r') as csv_file:
                 data = csv.DictReader(csv_file)

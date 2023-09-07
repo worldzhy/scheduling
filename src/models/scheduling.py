@@ -20,26 +20,30 @@ def get_program_by_id (programId: str) -> Program | None:
             break
     return targetProgram
 
+def get_similarity_score(target: int, actual: int):
+    absolute_difference = abs(target - actual)
+    if absolute_difference == 0:
+        return 1.0  
+    similarity_score = 1.0 - (absolute_difference / max(target, actual))
+    return max(0, similarity_score) 
+
 # Population function
 def populate_func(population_size: int) -> Population:
     return [choices(cast(Any, choices_list), k = int(Constant.SLOTS_PER_DAY_NUM) * Constant.DAYS_NUM) for _ in range(population_size)]
 
 # Fitness function
-def fitness_func(genome: Genome) -> int:
+def fitness_func(genome: Genome) -> float:
     schedule = schedulize(genome, Constant.RESOLUTION_IN_MINUTES)
     value = 0
     for _, course in enumerate(schedule):
         if course.course.programId is not None:
             program = get_program_by_id(course.course.programId)
-            if program is not None and course.duration != program.duration:
-                value = 0
-                break
-            else:
-                value = value + 1
+            if program is not None:
+                value = value + get_similarity_score(program.duration, course.duration)
     return value
 
 # Selection function
-def selection_func(population: Population, calc_fitness: Callable[[Genome], int]) -> Tuple[Genome, Genome]:
+def selection_func(population: Population, calc_fitness: Callable[[Genome], float]) -> Tuple[Genome, Genome]:
     custom_weights = [calc_fitness(genome) for genome in population]
     selected = choices(
         population = population,
@@ -73,6 +77,6 @@ GeneticAlgorithm[Course](
     selection_func,
     crossover_func,
     mutation_func
-).run(mutation_rate=0.5, population_size=100)
+).run(mutation_rate=0.4, population_size=20)
 
 # print(selection_func(populate_func(5), fitness_func))
