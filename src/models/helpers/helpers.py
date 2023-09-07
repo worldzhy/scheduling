@@ -1,23 +1,6 @@
-# Imports
-from typing import List, NamedTuple, Type, TypeVar
 import csv
-
-# Types
-class Studios(NamedTuple):
-        id: str
-        name: str
-
-class Programs(NamedTuple):
-        id: str
-        name: str
-
-class Coaches(NamedTuple):
-        id: str
-        name: str
-
-class Days(NamedTuple):
-        id: str
-        name: str
+from typing import List, Type, TypeVar
+from helpers.types import Studio, Program, Coach, Day, Class, Qualification
 
 # Helper functions
 def load_data():
@@ -33,4 +16,28 @@ def load_data():
                 for row in data:
                     ret.append(set_type(row['id'], row['name']))
         return ret
-    return get_data(Studios, 'studios'), get_data(Programs, 'programs'), get_data(Coaches, 'coaches'), get_data(Days, 'days')
+    return get_data(Studio, 'studios'), get_data(Program, 'programs'), get_data(Coach, 'coaches'), get_data(Day, 'days')
+
+def get_choices(programs: List[Program], coaches: List[Coach]) -> List[Class]:
+    choices: List[Class] = []
+    choices.append(Class(None, None))
+    for p in programs:
+        for c in coaches:
+            choices.append(Class(p.id, c.id))
+    return choices
+
+def get_qualifications(programs: List[Program], coaches: List[Coach]) -> List[Qualification]:
+    ret: List[Qualification] = []
+    with open('data/processed/constraints.csv', 'r') as csv_file:
+        data = csv.DictReader(csv_file)
+        coachIds = [coach.id for coach in coaches]
+        programIds = [program.id for program in programs]
+        for c in coachIds:
+            for p in programIds:
+                ret.append(Qualification(p, c, False))
+        for row in data:
+            if row['coach'] in coachIds:
+                for p in row['programs'].split(','):
+                        if p in programIds:
+                                ret.append(Qualification(p, row['coach'], True))
+    return ret
