@@ -77,6 +77,6 @@ GeneticAlgorithm[Course](
     selection_func,
     crossover_func,
     mutation_func
-).run(mutation_rate=0.4, population_size=20)
+).run(mutation_rate=0.4, population_size=40)
 
 # print(selection_func(populate_func(5), fitness_func))
