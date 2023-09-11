@@ -100,4 +100,4 @@ GeneticAlgorithm[Course | None](
     selection_func,
     crossover_func,
     mutation_func
-).run(mutation_rate=0.4, population_size=40)
+).run(mutation_rate=0.4, population_size=100)
