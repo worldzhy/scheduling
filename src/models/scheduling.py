@@ -1,5 +1,5 @@
 # Imports
-from random import choices, uniform, randint
+from random import choices, uniform
 from typing import Callable, Tuple
 from algorithms.ga import GeneticAlgorithm
 from helpers.helpers import load_data, get_qualifications
@@ -92,15 +92,33 @@ def selection_func(population: Population, calc_fitness: Callable[[Genome], floa
     return selected[0], selected[1]
 
 # Crossover function
-def crossover_func(parents: Tuple[Genome, Genome]) -> Tuple[Genome, Genome]:
+def crossover_func(parents: Tuple[Genome, Genome], num_crossover_points: int) -> Tuple[Genome, Genome]:
     genome1 = parents[0]
     genome2 = parents[1]
-    point = randint(0, len(genome1))
-    genome1A = genome1[:point]
-    genome1B = genome1[point:]
-    genome2A = genome2[:point]
-    genome2B = genome2[point:]
-    return genome1A + genome2B, genome1B + genome2A
+    
+    # Ensure the number of crossover points does not exceed the genome length
+    num_crossover_points = min(num_crossover_points, len(genome1) - 1)
+    
+    # Generate random crossover points
+    crossover_points = sorted(choices(range(1, len(genome1)), k = num_crossover_points))
+
+    # Initialize lists to store offspring genomes
+    offspring1: Genome = []
+    offspring2: Genome = []
+    
+    # Iterate through the crossover points and alternate between parents
+    current_parent = 1
+    for i in range(len(genome1)):
+        if i in crossover_points:
+            current_parent = 1 - current_parent  # Switch to the other parent
+        if current_parent == 0:
+            offspring1.append(genome1[i])
+            offspring2.append(genome2[i])
+        else:
+            offspring1.append(genome2[i])
+            offspring2.append(genome1[i])
+    
+    return offspring1, offspring2
 
 # # Mutation function
 def mutation_func(genome: Genome, mutation_rate: float) -> Genome:
@@ -116,7 +134,12 @@ result = GeneticAlgorithm[Course | None](
     selection_func,
     crossover_func,
     mutation_func
-).run(mutation_rate=0.4, population_size=100, max_iteration=100)
+).run(
+    mutation_rate=0.4,
+    population_size=100,
+    max_iteration=100,
+    num_crossover=5
+)
 result = [c for c in result if c is not None]
 result = sorted(result, key=lambda c: (c.day.value, c.time.value))
 with open('output.out', 'w') as f:

@@ -8,7 +8,7 @@ class GeneticAlgorithm(Generic[T]):
         populate_func: Callable[[int], List[List[T]]],
         fitness_func: Callable[[List[T]], float],
         selection_func: Callable[[List[List[T]], Callable[[List[T]], float]], Tuple[List[T], List[T]]],
-        crossover_func: Callable[[Tuple[List[T], List[T]]], Tuple[List[T], List[T]]],
+        crossover_func: Callable[[Tuple[List[T], List[T]], int], Tuple[List[T], List[T]]],
         mutation_func: Callable[[List[T], float], List[T]],
         printer_func: Union[Callable[[List[List[T]], Callable[[List[T]], float], int], None], None] = None,
     ):
@@ -19,7 +19,7 @@ class GeneticAlgorithm(Generic[T]):
         self._mutation_func = mutation_func
         self._printer_func = printer_func
 
-    def run(self, max_fitness: int = 1000000, max_iteration: int = 1000, population_size: int = 10, mutation_rate: float = 0.3):
+    def run(self, max_fitness: int = 1000000, max_iteration: int = 1000, population_size: int = 10, mutation_rate: float = 0.3, num_crossover: int = 2):
         population: List[List[T]] = self._populate_func(population_size)
         for i in range(max_iteration):
             if (self._printer_func is not None):
@@ -36,7 +36,7 @@ class GeneticAlgorithm(Generic[T]):
             next_generation = population[0:2]
             for _ in range(int(population_size / 2 ) - 1):
                 parents = self._selection_func(population, self._fitness_func)
-                offspring_a, offspring_b = self._crossover_func(parents)
+                offspring_a, offspring_b = self._crossover_func(parents, num_crossover)
                 offspring_a = self._mutation_func(offspring_a, mutation_rate)
                 offspring_b = self._mutation_func(offspring_b, mutation_rate)
                 next_generation += [offspring_a, offspring_b]
