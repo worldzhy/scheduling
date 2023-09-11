@@ -1,15 +1,14 @@
 # Imports
 from random import choices, uniform, randint
-from typing import Any, Callable, Tuple, cast
+from typing import Callable, Tuple
 from algorithms.ga import GeneticAlgorithm
-from helpers.helpers import load_data, get_choices, get_qualifications, schedulize
+from helpers.helpers import load_data, get_qualifications
 from helpers.Type import Genome, Population, Program, Course
 from helpers.constants import Constant
 
 ## Data
-studios, programs, coaches, days = load_data()
+studios, programs, coaches, days, times = load_data()
 qualifications = get_qualifications(programs, coaches)
-choices_list = get_choices(programs, coaches)
 
 ## Helpers
 def get_program_by_id (programId: str) -> Program | None:
@@ -20,6 +19,16 @@ def get_program_by_id (programId: str) -> Program | None:
             break
     return targetProgram
 
+def generate_rnd_course():
+    if (uniform(0, 1) > 0.2):
+        program = choices(programs, k = 1)[0]
+        coach = choices(coaches, k = 1)[0]
+        day = choices(days, k = 1)[0]
+        time = choices(times, k = 1)[0]
+        return Course(program, coach, day, time)
+    else:
+        return None
+
 def get_similarity_score(target: int, actual: int):
     absolute_difference = abs(target - actual)
     if absolute_difference == 0:
@@ -29,18 +38,32 @@ def get_similarity_score(target: int, actual: int):
 
 # Population function
 def populate_func(population_size: int) -> Population:
-    return [choices(cast(Any, choices_list), k = int(Constant.SLOTS_PER_DAY_NUM) * Constant.DAYS_NUM) for _ in range(population_size)]
+    population: Population = []
+    for _ in range(population_size):
+        genome: Genome = []
+        for _ in range(Constant.MAX_MONTH_PROGRAM_COUNT):
+            genome.append(generate_rnd_course())
+        population.append(genome)
+    return population
 
 # Fitness function
 def fitness_func(genome: Genome) -> float:
-    schedule = schedulize(genome, Constant.RESOLUTION_IN_MINUTES)
+    timeslots = [[False for _ in range(Constant.SLOTS_PER_DAY_NUM)] for _ in range(Constant.DAYS_NUM)]
     value = 0
-    for _, course in enumerate(schedule):
-        if course.course.programId is not None:
-            program = get_program_by_id(course.course.programId)
-            if program is not None:
-                value = value + get_similarity_score(program.duration, course.duration)
-    return value
+    for course in genome:
+        if course is not None:
+            day = course.day.value
+            time = course.time.value
+            duration = course.program.duration
+            for time_specific in range(duration // Constant.RESOLUTION_IN_MINUTES):
+                if (time + time_specific >= len(timeslots[day])):
+                    value = value - 2
+                elif timeslots[day][time + time_specific] == False:
+                    value = value + 1
+                else:
+                    value = value - 2
+                    timeslots[day][time + time_specific] = True
+    return value + Constant.FITNESS_ADJ
 
 # Selection function
 def selection_func(population: Population, calc_fitness: Callable[[Genome], float]) -> Tuple[Genome, Genome]:
@@ -63,20 +86,18 @@ def crossover_func(parents: Tuple[Genome, Genome]) -> Tuple[Genome, Genome]:
     genome2B = genome2[point:]
     return genome1A + genome2B, genome1B + genome2A
 
-# Mutation function
+# # Mutation function
 def mutation_func(genome: Genome, mutation_rate: float) -> Genome:
     for i, _ in enumerate(genome):
         if (uniform(0, 1) > mutation_rate):
-            genome[i] = choices(choices_list, k = 1)[0]
+            genome[i] = generate_rnd_course()
     return genome
 
 # Run model
-GeneticAlgorithm[Course](
+GeneticAlgorithm[Course | None](
     populate_func,
     fitness_func,
     selection_func,
     crossover_func,
     mutation_func
 ).run(mutation_rate=0.4, population_size=40)
-
-# print(selection_func(populate_func(5), fitness_func))

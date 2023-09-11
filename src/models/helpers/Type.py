@@ -1,4 +1,4 @@
-from typing import List, NamedTuple, Union
+from typing import List, NamedTuple
 from xmlrpc.client import boolean
 
 ## Basic Entities
@@ -18,19 +18,25 @@ class Coach(NamedTuple):
 
 class Day(NamedTuple):
         id: str
-        name: str
+        value: int
+
+class Time(NamedTuple):
+        id: str
+        value: int
 
 ## Compounded Type
 
 class Course(NamedTuple):
-    programId: Union[str, None]
-    coachId: Union[str, None]
+    program: Program
+    coach: Coach
+    day: Day
+    time: Time
 
-class CourseWithSchedule(NamedTuple):
-    course: Course
-    start_time: int
-    end_time: int
-    duration: int
+# class CourseWithSchedule(NamedTuple):
+#     course: Course
+#     start_time: int
+#     end_time: int
+#     duration: int
 
 class Qualification(NamedTuple):
     programId: str
@@ -39,6 +45,6 @@ class Qualification(NamedTuple):
 
 ## Genetic Algorithm Representation
 
-Genome = List[Course]
+Genome = List[Course | None]
 
 Population = List[Genome]

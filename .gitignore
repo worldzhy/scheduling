@@ -4,3 +4,7 @@
 *.out
 # Raw data (files too large)
 data/raw/*
+# Compiled bytecodes
+**/*.pyc
+# Test file
+test.py
