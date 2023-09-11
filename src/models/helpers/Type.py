@@ -31,6 +31,8 @@ class Course(NamedTuple):
     coach: Coach
     day: Day
     time: Time
+    start_time: str
+    end_time: str
 
 # class CourseWithSchedule(NamedTuple):
 #     course: Course

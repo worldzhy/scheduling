@@ -41,6 +41,11 @@ class GeneticAlgorithm(Generic[T]):
                 offspring_b = self._mutation_func(offspring_b, mutation_rate)
                 next_generation += [offspring_a, offspring_b]
             population = next_generation
+        return sorted(
+            population,
+            key=lambda genome: self._fitness_func(genome),
+            reverse=True
+        )[0]
 
     def _printer_default(self, population: List[List[T]], fitness_func: Callable[[List[T]], float], generation_id: int) -> None:
         sorted_population = sorted(population, key=fitness_func, reverse=True)

@@ -5,6 +5,7 @@ from algorithms.ga import GeneticAlgorithm
 from helpers.helpers import load_data, get_qualifications
 from helpers.Type import Genome, Population, Program, Course
 from helpers.constants import Constant
+import sys
 
 ## Data
 studios, programs, coaches, days, times = load_data()
@@ -19,13 +20,28 @@ def get_program_by_id (programId: str) -> Program | None:
             break
     return targetProgram
 
+def convert_to_time(input_value: int):
+    if 0 <= input_value <= 203:
+        hours = 5 + input_value // 12
+        minutes = (input_value % 12) * 5
+        period = "AM" if hours < 12 else "PM"
+        if hours == 12:
+            period = "PM"
+        if hours > 12:
+            hours -= 12
+        return f"{hours:02d}:{minutes:02d} {period}"
+    else:
+        return "Invalid input"
+
 def generate_rnd_course():
     if (uniform(0, 1) > 0.2):
         program = choices(programs, k = 1)[0]
         coach = choices(coaches, k = 1)[0]
         day = choices(days, k = 1)[0]
         time = choices(times, k = 1)[0]
-        return Course(program, coach, day, time)
+        start_time = convert_to_time(day.value)
+        end_time = convert_to_time(day.value + program.duration // 5)
+        return Course(program, coach, day, time, start_time, end_time)
     else:
         return None
 
@@ -63,7 +79,7 @@ def fitness_func(genome: Genome) -> float:
                 else:
                     value = value - 2
                     timeslots[day][time + time_specific] = True
-    return value + Constant.FITNESS_ADJ
+    return value
 
 # Selection function
 def selection_func(population: Population, calc_fitness: Callable[[Genome], float]) -> Tuple[Genome, Genome]:
@@ -94,10 +110,16 @@ def mutation_func(genome: Genome, mutation_rate: float) -> Genome:
     return genome
 
 # Run model
-GeneticAlgorithm[Course | None](
+result = GeneticAlgorithm[Course | None](
     populate_func,
     fitness_func,
     selection_func,
     crossover_func,
     mutation_func
-).run(mutation_rate=0.4, population_size=100)
+).run(mutation_rate=0.4, population_size=100, max_iteration=100)
+result = [c for c in result if c is not None]
+result = sorted(result, key=lambda c: (c.day.value, c.time.value))
+with open('output.out', 'w') as f:
+    sys.stdout = f
+    for r in result:
+        print(f'Day {r.day.value + 1} -- {r.start_time} to {r.end_time} -- {r.program.name} -- {r.coach.name}')
