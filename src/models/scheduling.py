@@ -137,12 +137,17 @@ result = GeneticAlgorithm[Course | None](
 ).run(
     mutation_rate=0.4,
     population_size=100,
-    max_iteration=100,
+    max_iteration=1,
     num_crossover=5
 )
-result = [c for c in result if c is not None]
-result = sorted(result, key=lambda c: (c.day.value, c.time.value))
-with open('output.out', 'w') as f:
-    sys.stdout = f
-    for r in result:
-        print(f'Day {r.day.value + 1} -- {r.start_time} to {r.end_time} -- {r.program.name} -- {r.coach.name}')
+
+def pipe_to_output(genome: Genome):
+    genome = [g for g in genome if g is not None]
+    genome = sorted(genome, key=lambda g: (g.day.value, g.time.value) if g is not None else (0, 0))
+    with open('output.out', 'w') as f:
+        sys.stdout = f
+        for g in genome:
+            if g is not None:
+                print(f'Day {g.day.value + 1} -- {g.start_time} to {g.end_time} -- {g.program.name} -- {g.coach.name}')
+
+pipe_to_output(result)
