@@ -1,6 +1,6 @@
 # Imports
 from random import choices, uniform
-from typing import Callable, Tuple
+from typing import Callable, Tuple, List
 from algorithms.ga import GeneticAlgorithm
 from helpers.helpers import load_data, get_qualifications
 from helpers.Type import Genome, Population, Program, Course
@@ -39,8 +39,8 @@ def generate_rnd_course():
         coach = choices(coaches, k = 1)[0]
         day = choices(days, k = 1)[0]
         time = choices(times, k = 1)[0]
-        start_time = convert_to_time(day.value)
-        end_time = convert_to_time(day.value + program.duration // 5)
+        start_time = convert_to_time(time.value)
+        end_time = convert_to_time(time.value + program.duration // 5)
         return Course(program, coach, day, time, start_time, end_time)
     else:
         return None
@@ -51,6 +51,41 @@ def get_similarity_score(target: int, actual: int):
         return 1.0  
     similarity_score = 1.0 - (absolute_difference / max(target, actual))
     return max(0, similarity_score) 
+
+def count_conflicts(genome: Genome) -> List[int]:
+    genome = [g for g in genome if g is not None]
+    genome = sorted(genome, key=lambda g: (g.day.value, g.time.value) if g is not None else (0, 0))
+    conflicts: List[int] = []
+    timeslots: List[List[int]] = [[False for _ in range(Constant.SLOTS_PER_DAY_NUM)] for _ in range(Constant.DAYS_NUM)]
+    for idx, course in enumerate(genome):
+        if course is not None:
+            day = course.day.value
+            time = course.time.value
+            duration = course.program.duration
+            isSkip = False
+            for time_specific in range(duration // Constant.RESOLUTION_IN_MINUTES):
+                if (time + time_specific >= len(timeslots[day])):
+                    isSkip = True
+                    break
+            if (isSkip == False):
+                for time_specific in range(duration // Constant.RESOLUTION_IN_MINUTES):
+                    if (timeslots[day][time + time_specific] == True):
+                        conflicts.append(idx + 1)
+                        break
+                    if (timeslots[day][time + time_specific] == False):
+                        timeslots[day][time + time_specific] = True
+    print(f'Number of conflicts is {len(conflicts)}: ${conflicts}')
+    return conflicts
+
+def pipe_to_output(genome: Genome):
+    genome = [g for g in genome if g is not None]
+    genome = sorted(genome, key=lambda g: (g.day.value, g.time.value) if g is not None else (0, 0))
+    with open('output.out', 'w') as f:
+        sys.stdout = f
+        for g in genome:
+            if g is not None:
+                print(f'Day {g.day.value + 1} -- {g.start_time} to {g.end_time} -- {g.program.name} -- {g.coach.name}')
+
 
 # Population function
 def populate_func(population_size: int) -> Population:
@@ -64,22 +99,30 @@ def populate_func(population_size: int) -> Population:
 
 # Fitness function
 def fitness_func(genome: Genome) -> float:
-    timeslots = [[False for _ in range(Constant.SLOTS_PER_DAY_NUM)] for _ in range(Constant.DAYS_NUM)]
-    value = 0
+    timeslots: List[List[int]] = [[0 for _ in range(Constant.SLOTS_PER_DAY_NUM)] for _ in range(Constant.DAYS_NUM)]
     for course in genome:
         if course is not None:
             day = course.day.value
             time = course.time.value
             duration = course.program.duration
+            isSkip = False
             for time_specific in range(duration // Constant.RESOLUTION_IN_MINUTES):
                 if (time + time_specific >= len(timeslots[day])):
-                    value = value - 2
-                elif timeslots[day][time + time_specific] == False:
-                    value = value + 1
-                else:
-                    value = value - 2
-                    timeslots[day][time + time_specific] = True
-    return value
+                    isSkip = True
+                    break
+            if isSkip == False:
+                for time_specific in range(duration // Constant.RESOLUTION_IN_MINUTES):
+                    timeslots[day][time + time_specific] += 1
+    sum = 0
+    for day in timeslots:
+        for freq in day:
+            if (freq == 0):
+                sum += 0
+            if (freq == 1):
+                sum += 10
+            else: 
+                sum += -freq
+    return sum
 
 # Selection function
 def selection_func(population: Population, calc_fitness: Callable[[Genome], float]) -> Tuple[Genome, Genome]:
@@ -136,18 +179,11 @@ result = GeneticAlgorithm[Course | None](
     mutation_func
 ).run(
     mutation_rate=0.4,
-    population_size=100,
-    max_iteration=1,
+    population_size=50,
+    max_iteration=1000,
     num_crossover=5
 )
 
-def pipe_to_output(genome: Genome):
-    genome = [g for g in genome if g is not None]
-    genome = sorted(genome, key=lambda g: (g.day.value, g.time.value) if g is not None else (0, 0))
-    with open('output.out', 'w') as f:
-        sys.stdout = f
-        for g in genome:
-            if g is not None:
-                print(f'Day {g.day.value + 1} -- {g.start_time} to {g.end_time} -- {g.program.name} -- {g.coach.name}')
-
+count_conflicts(result)
 pipe_to_output(result)
+
