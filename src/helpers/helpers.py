@@ -5,7 +5,7 @@ from entities.Day import Day
 from entities.Program import Program
 from entities.Studio import Studio
 from entities.Time import Time
-from helpers.Type import Qualification
+from entities.Qualification import Qualification
 
 # Helper functions
 def load_data():
