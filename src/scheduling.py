@@ -4,7 +4,7 @@ from typing import Callable, Tuple, List
 from algorithm.ga import GeneticAlgorithm
 from helpers.helpers import load_data, get_qualifications
 from helpers.Type import Genome, Population, Program, Course
-from helpers.constants import Constant
+from entities.Constant import Constant
 import sys
 
 ## Data
