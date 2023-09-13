@@ -14,17 +14,8 @@ Genome = List[Course | None]
 Population = List[Genome]
 
 ## Data
-studios, programs, coaches, days, times = Data(Configuration()).load()
-print(coaches[0].programs[0].id)
-
-## Helpers
-def get_program_by_id (programId: str) -> Program | None:
-    targetProgram: Program | None = None
-    for program in programs:
-        if program.id == programId:
-            targetProgram = program
-            break
-    return targetProgram
+dataset = Data(Configuration())
+studios, programs, coaches, days, times = dataset.load()
 
 def convert_to_time(input_value: int):
     if 0 <= input_value <= 203:
@@ -50,13 +41,6 @@ def generate_rnd_course():
         return Course(program, coach, day, time, start_time, end_time)
     else:
         return None
-
-def get_similarity_score(target: int, actual: int):
-    absolute_difference = abs(target - actual)
-    if absolute_difference == 0:
-        return 1.0  
-    similarity_score = 1.0 - (absolute_difference / max(target, actual))
-    return max(0, similarity_score) 
 
 def count_conflicts(genome: Genome) -> List[int]:
     genome = [g for g in genome if g is not None]
@@ -177,19 +161,19 @@ def mutation_func(genome: Genome, mutation_rate: float) -> Genome:
     return genome
 
 # Run model
-# result = GeneticAlgorithm[Course | None](
-#     populate_func,
-#     fitness_func,
-#     selection_func,
-#     crossover_func,
-#     mutation_func
-# ).run(
-#     mutation_rate=0.4,
-#     population_size=50,
-#     max_iteration=1000,
-#     num_crossover=5
-# )
+result = GeneticAlgorithm[Course | None](
+    populate_func,
+    fitness_func,
+    selection_func,
+    crossover_func,
+    mutation_func
+).run(
+    mutation_rate=0.4,
+    population_size=50,
+    max_iteration=1000,
+    num_crossover=5
+)
 
-# count_conflicts(result)
-# pipe_to_output(result)
+count_conflicts(result)
+pipe_to_output(result)
 
