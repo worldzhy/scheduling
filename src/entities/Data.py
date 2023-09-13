@@ -63,19 +63,6 @@ class Data:
                     if (p.id in row['programs'].split(',')):
                         coach.add_program(p)
 
-    def _convert_to_time(self, input_value: int):
-        if 0 <= input_value <= 203:
-            hours = 5 + input_value // 12
-            minutes = (input_value % 12) * 5
-            period = "AM" if hours < 12 else "PM"
-            if hours == 12:
-                period = "PM"
-            if hours > 12:
-                hours -= 12
-            return f"{hours:02d}:{minutes:02d} {period}"
-        else:
-            return "Invalid input"
-
     def load(self):
         # Load data
         self._parse_studio()
@@ -92,12 +79,11 @@ class Data:
 
     def get_rnd_course(self):
         if (uniform(0, 1) > 0.2):
-            program = choices(self.programs, k = 1)[0]
-            coach = choices(self.coaches, k = 1)[0]
-            day = choices(self.days, k = 1)[0]
-            time = choices(self.times, k = 1)[0]
-            start_time = self._convert_to_time(time.value)
-            end_time = self._convert_to_time(time.value + program.duration // 5)
-            return Course(program, coach, day, time, start_time, end_time)
+            return Course(
+                choices(self.programs, k = 1)[0],
+                choices(self.coaches, k = 1)[0],
+                choices(self.days, k = 1)[0],
+                choices(self.times, k = 1)[0]
+            )
         else:
             return None

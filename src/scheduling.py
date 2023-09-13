@@ -48,7 +48,7 @@ def pipe_to_output(genome: Genome):
         sys.stdout = f
         for g in genome:
             if g is not None:
-                print(f'Day {g.day.value + 1} -- {g.start_time} to {g.end_time} -- {g.program.name} -- {g.coach.name}')
+                print(f'Day {g.day.value + 1} -- {g.time.clock_start} to {g.time.clock_end} -- {g.program.name} -- {g.coach.name}')
 
 
 # Population function
