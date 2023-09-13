@@ -3,7 +3,7 @@ from random import choices, uniform
 from typing import Callable, Tuple, List
 from algorithm.ga import GeneticAlgorithm
 from entities.Program import Program
-from helpers.helpers import load_data
+from entities.Configuration import load_data
 from entities.Constant import Constant
 from entities.Course import Course
 import sys
