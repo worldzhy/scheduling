@@ -135,23 +135,13 @@ def add_constraint_coach_qualifications(model):
                 rhs = 0
                 model.coach_qualifications.add(lhs == rhs)
 
-# def add_constraint_program_duration(model):
-#     """
-#     Adds coach qualification constraints. If a coach is unqualified to teach a program, they cannot be assigned to that program.
-
-#     Parameters:
-#     :param model: The model instance
-
-#     Returns:
-#     :return: None
-#     """
-#     model.coach_qualifications = pe.ConstraintList()
-#     for p in model.programs:
-#         for c in model.coaches:
-#             if (model.q[p, c] == 0):
-#                 lhs = sum(model.x[s, t, d, p, c] for s in model.studios for t in model.timeslots for d in model.days)
-#                 rhs = 0
-#                 model.coach_qualifications.add(lhs == rhs)
+def add_constraint_program_duration(model):
+    model.program_duration = pe.ConstraintList()
+    agg = create_end_times(model_to_array(model))
+    for g in agg:
+        lhs = int(g.time_end[1:]) - int(g.time_start[1:])
+        rhs = 5
+        model.program_duration.add(lhs == rhs)
 
 def convert_to_time(input_value: int):
     if 0 <= input_value <= 203:
@@ -169,13 +159,13 @@ def convert_to_time(input_value: int):
 def model_to_array(model) -> List[Course]:
     res: List[Course] = []
     # Extract results
-    df = pd.DataFrame(index=pd.MultiIndex.from_tuples(model.x, names=['s', 't', 'd', 'p', 'c']))
-    df['x'] = [pe.value(model.x[key]) for key in df.index]
-    df['p'] = [model.p[key] for key in df.index]
-
-    for (s, t, d, p, c), values in df.iterrows():
-        if (values.x == 1):
-            res.append(Course(cast(str, s), cast(str, p), cast(str, c), cast(str, d), cast(str, t), convert_to_time(int(cast(str, t[1:])))))
+    for s in model.studios:
+        for t in model.timeslots:
+            for d in model.days:
+                for p in model.programs:
+                    for c in model.coaches:
+                        if (pe.value(model.x[s, t, d, p, c]) == 1):
+                            res.append(Course(cast(str, s), cast(str, p), cast(str, c), cast(str, d), cast(str, t), convert_to_time(int(cast(str, t[1:])))))
     return res
 
 class AggregateCourse(NamedTuple):
@@ -197,7 +187,6 @@ def create_end_times(course: List[Course]) -> List[AggregateCourse]:
     current_aggregate = courses_agg[0]
 
     for next_course in courses_agg[1:]:
-        print(current_aggregate.time_start[1:], next_course.time_start[1:])
         if (
             current_aggregate.studio == next_course.studio and
             current_aggregate.program == next_course.program and
@@ -291,6 +280,7 @@ def main():
     # Constraints
     add_constraint_concurrency(model)
     add_constraint_coach_qualifications(model)
+    add_constraint_program_duration(model)
 
     # Execute solver
     solver = po.SolverFactory('glpk', executable='/opt/homebrew/bin/glpsol')
