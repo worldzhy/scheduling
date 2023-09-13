@@ -1,7 +1,7 @@
 # Imports
 from random import choices, uniform
 from typing import Callable, Tuple, List
-from algorithms.ga import GeneticAlgorithm
+from algorithm.ga import GeneticAlgorithm
 from helpers.helpers import load_data, get_qualifications
 from helpers.Type import Genome, Population, Program, Course
 from helpers.constants import Constant
