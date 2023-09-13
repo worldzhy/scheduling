@@ -1,6 +1,11 @@
 import csv
 from typing import List, Type, TypeVar
-from helpers.Type import Studio, Program, Coach, Day, Qualification, Time
+from entities.Coach import Coach
+from entities.Day import Day
+from entities.Program import Program
+from entities.Studio import Studio
+from entities.Time import Time
+from helpers.Type import Qualification
 
 # Helper functions
 def load_data():

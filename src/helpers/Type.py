@@ -1,28 +1,9 @@
 from typing import List, NamedTuple
 from xmlrpc.client import boolean
-
-## Basic Entities
-
-class Studio(NamedTuple):
-        id: str
-        name: str
-
-class Program(NamedTuple):
-        id: str
-        name: str
-        duration: int
-
-class Coach(NamedTuple):
-        id: str
-        name: str
-
-class Day(NamedTuple):
-        id: str
-        value: int
-
-class Time(NamedTuple):
-        id: str
-        value: int
+from entities.Coach import Coach
+from entities.Day import Day
+from entities.Time import Time
+from entities.Program import Program
 
 ## Compounded Type
 
