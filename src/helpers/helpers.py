@@ -5,7 +5,6 @@ from entities.Day import Day
 from entities.Program import Program
 from entities.Studio import Studio
 from entities.Time import Time
-from entities.Qualification import Qualification
 
 # Helper functions
 def load_data():
@@ -29,48 +28,29 @@ def load_data():
                 for row in data:
                     ret.append(set_type(row['id'], row['name']))
         return ret
-    return get_data(Studio, 'studios'), get_data(Program, 'programs'), get_data(Coach, 'coaches'), get_data(Day, 'days'), get_data(Time, 'times')
+    # Load data
+    studios = get_data(Studio, 'studios')
+    programs = get_data(Program, 'programs')
+    coaches = get_data(Coach, 'coaches')
+    days = get_data(Day, 'days')
+    times  = get_data(Time, 'times')
+    # Add coach qualification
+    add_coach_qualification(programs, coaches)
+    # Return values
+    return studios, programs, coaches, days, times
 
-# def get_choices(programs: List[Program], coaches: List[Coach]) -> List[Course]:
-#     choices: List[Course] = []
-#     choices.append(Course(None, None))
-#     for p in programs:
-#         for c in coaches:
-#             choices.append(Course(p.id, c.id))
-#     return choices
-
-def get_qualifications(programs: List[Program], coaches: List[Coach]) -> List[Qualification]:
-    ret: List[Qualification] = []
+def add_coach_qualification(programs: List[Program], coaches: List[Coach]):
     with open('data/processed/constraints.csv', 'r') as csv_file:
-        data = csv.DictReader(csv_file)
-        coachIds = [coach.id for coach in coaches]
-        programIds = [program.id for program in programs]
-        for c in coachIds:
-            for p in programIds:
-                ret.append(Qualification(p, c, False))
-        for row in data:
-            if row['coach'] in coachIds:
-                for p in row['programs'].split(','):
-                        if p in programIds:
-                                ret.append(Qualification(p, row['coach'], True))
-    return ret
-
-# def create_schedule(course: Course, start_time: int, end_time: int, resolution: int) -> CourseWithSchedule:
-#         duration = (end_time - start_time) * resolution
-#         return CourseWithSchedule(course, start_time, end_time, duration)
-
-# def schedulize(courses: List[Course], resolution: int) -> List[CourseWithSchedule]:
-#     results: List[CourseWithSchedule] = []
-#     prev_course: Course = courses[0] 
-#     start_time: int = 0
-
-#     for i, current_course in enumerate(courses):
-#         if i != 0 and (prev_course.programId != current_course.programId or prev_course.coachId != current_course.coachId):
-#              results.append(create_schedule(prev_course, start_time, i, resolution))
-#              start_time = i
-#              prev_course = current_course
-    
-#     # Add last interval
-#     results.append(create_schedule(prev_course, start_time, len(courses), resolution))
-
-#     return results
+        for row in csv.DictReader(csv_file):
+            # Find coach in coaches array
+            coach: None | Coach = None
+            for c in coaches:
+                if (c.id == row['coach']):
+                    coach = c
+                    break
+            if coach is None:
+                continue
+            # Add programs to coach
+            for p in programs:
+                if (p.id in row['programs'].split(',')):
+                    coach.add_program(p)

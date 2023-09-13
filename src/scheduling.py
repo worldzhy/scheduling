@@ -3,7 +3,7 @@ from random import choices, uniform
 from typing import Callable, Tuple, List
 from algorithm.ga import GeneticAlgorithm
 from entities.Program import Program
-from helpers.helpers import load_data, get_qualifications
+from helpers.helpers import load_data
 from entities.Constant import Constant
 from entities.Course import Course
 import sys
@@ -14,7 +14,8 @@ Population = List[Genome]
 
 ## Data
 studios, programs, coaches, days, times = load_data()
-qualifications = get_qualifications(programs, coaches)
+
+print(coaches[0].programs[0].id)
 
 ## Helpers
 def get_program_by_id (programId: str) -> Program | None:
@@ -176,19 +177,19 @@ def mutation_func(genome: Genome, mutation_rate: float) -> Genome:
     return genome
 
 # Run model
-result = GeneticAlgorithm[Course | None](
-    populate_func,
-    fitness_func,
-    selection_func,
-    crossover_func,
-    mutation_func
-).run(
-    mutation_rate=0.4,
-    population_size=50,
-    max_iteration=1000,
-    num_crossover=5
-)
+# result = GeneticAlgorithm[Course | None](
+#     populate_func,
+#     fitness_func,
+#     selection_func,
+#     crossover_func,
+#     mutation_func
+# ).run(
+#     mutation_rate=0.4,
+#     population_size=50,
+#     max_iteration=1000,
+#     num_crossover=5
+# )
 
-count_conflicts(result)
-pipe_to_output(result)
+# count_conflicts(result)
+# pipe_to_output(result)
 
