@@ -4,10 +4,13 @@ from typing import Callable, Tuple, List
 from algorithm.ga import GeneticAlgorithm
 from entities.Program import Program
 from helpers.helpers import load_data, get_qualifications
-from helpers.Type import Genome, Population
 from entities.Constant import Constant
 from entities.Course import Course
 import sys
+
+# GA representation
+Genome = List[Course | None]
+Population = List[Genome]
 
 ## Data
 studios, programs, coaches, days, times = load_data()
