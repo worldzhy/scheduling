@@ -2,8 +2,9 @@
 from random import choices, uniform
 from typing import Callable, Tuple, List
 from algorithm.ga import GeneticAlgorithm
+from entities.Configuration import Configuration
 from entities.Program import Program
-from entities.Configuration import load_data
+from entities.Data import Data
 from entities.Constant import Constant
 from entities.Course import Course
 import sys
@@ -13,8 +14,7 @@ Genome = List[Course | None]
 Population = List[Genome]
 
 ## Data
-studios, programs, coaches, days, times = load_data()
-
+studios, programs, coaches, days, times = Data(Configuration()).load()
 print(coaches[0].programs[0].id)
 
 ## Helpers
