@@ -3,7 +3,6 @@ from random import choices, uniform
 from typing import Callable, Tuple, List
 from algorithm.ga import GeneticAlgorithm
 from entities.Configuration import Configuration
-from entities.Program import Program
 from entities.Data import Data
 from entities.Constant import Constant
 from entities.Course import Course
@@ -14,33 +13,8 @@ Genome = List[Course | None]
 Population = List[Genome]
 
 ## Data
-dataset = Data(Configuration())
-studios, programs, coaches, days, times = dataset.load()
-
-def convert_to_time(input_value: int):
-    if 0 <= input_value <= 203:
-        hours = 5 + input_value // 12
-        minutes = (input_value % 12) * 5
-        period = "AM" if hours < 12 else "PM"
-        if hours == 12:
-            period = "PM"
-        if hours > 12:
-            hours -= 12
-        return f"{hours:02d}:{minutes:02d} {period}"
-    else:
-        return "Invalid input"
-
-def generate_rnd_course():
-    if (uniform(0, 1) > 0.2):
-        program = choices(programs, k = 1)[0]
-        coach = choices(coaches, k = 1)[0]
-        day = choices(days, k = 1)[0]
-        time = choices(times, k = 1)[0]
-        start_time = convert_to_time(time.value)
-        end_time = convert_to_time(time.value + program.duration // 5)
-        return Course(program, coach, day, time, start_time, end_time)
-    else:
-        return None
+data = Data(Configuration())
+studios, programs, coaches, days, times = data.load()
 
 def count_conflicts(genome: Genome) -> List[int]:
     genome = [g for g in genome if g is not None]
@@ -83,7 +57,7 @@ def populate_func(population_size: int) -> Population:
     for _ in range(population_size):
         genome: Genome = []
         for _ in range(Constant.MAX_MONTH_PROGRAM_COUNT):
-            genome.append(generate_rnd_course())
+            genome.append(data.get_rnd_course())
         population.append(genome)
     return population
 
@@ -157,7 +131,7 @@ def crossover_func(parents: Tuple[Genome, Genome], num_crossover_points: int) ->
 def mutation_func(genome: Genome, mutation_rate: float) -> Genome:
     for i, _ in enumerate(genome):
         if (uniform(0, 1) > mutation_rate):
-            genome[i] = generate_rnd_course()
+            genome[i] = data.get_rnd_course()
     return genome
 
 # Run model
