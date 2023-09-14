@@ -1,7 +1,7 @@
 # Imports
 from random import choices, uniform
 from typing import Callable, Tuple, List
-from algorithm.ga import GeneticAlgorithm
+from algorithm.geneticAlgorithm.model import GeneticAlgorithm
 from entities.Configuration import Configuration
 from entities.Data import Data
 from entities.Constant import Constant
