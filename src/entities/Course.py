@@ -1,7 +1,7 @@
-from entities.Coach import Coach
-from entities.Day import Day
-from entities.Program import Program
-from entities.Time import Time
+from .Coach import Coach
+from .Day import Day
+from .Program import Program
+from .Time import Time
 
 
 class Course():

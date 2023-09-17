@@ -1,18 +1,19 @@
 import csv
 from random import choices, uniform
 from typing import List
-from entities.Coach import Coach
-from entities.Configuration import Configuration
-from entities.Course import Course
-from entities.Day import Day
-from entities.Program import Program
-from entities.Studio import Studio
-from entities.Time import Time
+from .Coach import Coach
+from .Course import Course
+from .Day import Day
+from .Program import Program
+from .Studio import Studio
+from .Time import Time
 
 class Data:
-    def __init__(self, config: Configuration):
-        # config
-        self.config = config
+    def __init__(self):
+        # data location
+        self._studio_csv = 'data/processed/studios.csv'
+        self._program_csv = 'data/processed/programs.csv'
+        self._coach_csv = 'data/processed/coaches.csv'
         # parsed studios
         self.studios: List[Studio] = []
         # parsed times
@@ -25,7 +26,7 @@ class Data:
         self.coaches: List[Coach] = []
 
     def _parse_studio(self):
-        with open(self.config.studio_csv, 'r') as csv_file:
+        with open(self._studio_csv, 'r') as csv_file:
             for row in csv.DictReader(csv_file):
                self.studios.append(Studio(row['id'], row['name']))
 
@@ -38,12 +39,12 @@ class Data:
             self.days.append(Day('D' + str(time), int(time)))
 
     def _parse_program(self):
-        with open(self.config.program_csv, 'r') as csv_file:
+        with open(self._program_csv, 'r') as csv_file:
             for row in csv.DictReader(csv_file):
                 self.programs.append(Program(row['id'], row['name'], int(row['duration'])))
 
     def _parse_coach(self):
-        with open(self.config.coach_csv, 'r') as csv_file:
+        with open(self._coach_csv, 'r') as csv_file:
             for row in csv.DictReader(csv_file):
                self.coaches.append(Coach(row['id'], row['name']))
 
@@ -70,13 +71,9 @@ class Data:
         self._parse_day()
         self._parse_program()
         self._parse_coach()
-
         # Add coach qualification
         self._add_coach_qualification()
         
-        # Return values
-        return self.studios, self.programs, self.coaches, self.days, self.times
-
     def get_rnd_course(self):
         if (uniform(0, 1) > 0.2):
             return Course(

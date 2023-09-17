@@ -1,5 +1,5 @@
 from typing import List
-from entities.Program import Program
+from .Program import Program
 
 
 class Coach:

@@ -1,21 +1,16 @@
 import traceback
-from algorithm.geneticAlgorithm.model import GeneticAlgorithm
+from src.algorithm.GeneticAlgorithm import GeneticAlgorithm
+from src.entities.Data import Data
 
 def main():
-    # Get configuration - Configuration file 
-    # configuration - Configuration
-
     # Get data - Data loader
-    # data = 
-
-    # Get protoype - GA specific functions are defined here
-    # prototype
-
+    data = Data()
     # Define algorithm to use
-    # algo = GeneticAlgorithm()
-
+    algo = GeneticAlgorithm(data)
     # Run algorithm 
-    # res = algo.run()
+    algo.run(
+        max_iteration = 10,
+    )
 
 
 try:

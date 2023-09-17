@@ -1,4 +1,4 @@
-from entities.Constant import Constant
+from .Constant import Constant
 
 class Time:
     # Initializes time
