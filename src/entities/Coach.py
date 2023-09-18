@@ -3,13 +3,12 @@ from .Program import Program
 
 
 class Coach:
-    # Initializes coach
     def __init__(self, id: str, name: str):
-        # Returns coach ID
+        # returns coach ID
         self.id = id
-        # Returns coach name
+        # returns coach name
         self.name = name
-        # List of programs qualified
+        # list of programs qualified
         self.programs: List[Program] = []
 
     def add_program(self, program: Program):
