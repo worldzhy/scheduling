@@ -1,4 +1,5 @@
 from random import uniform
+import sys
 from typing import Callable, List
 from .Constant import Constant
 from .Course import Course
@@ -41,7 +42,7 @@ class Schedule:
                     sum += -freq
         return sum
 
-    # Get conflicts
+    # get conflicts
     def get_conflicts(self) -> List[int]:
         # initialize list of conflicts
         conflicts: List[int] = []
@@ -69,6 +70,14 @@ class Schedule:
                         break
                     if (timeslots[day][time + time_specific] == False):
                         timeslots[day][time + time_specific] = True
-        print(f'Number of conflicts is {len(conflicts)}: ${conflicts}')
         return conflicts
 
+    # write schedule to output file
+    def save_to_file(self, filename: str = 'output.out'):
+        schedule = [c for c in self.list if c is not None]
+        schedule = sorted(schedule, key=lambda c: (c.day.value, c.time.value))
+        with open(filename, 'w') as f:
+            sys.stdout = f
+            for c in schedule:
+                print(f'Day {c.day.value + 1} -- {c.time.clock_start} to {c.time.clock_end} -- {c.program.name} -- {c.coach.name}')
+            sys.stdout = sys.__stdout__

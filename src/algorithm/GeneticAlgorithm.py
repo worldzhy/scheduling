@@ -1,6 +1,5 @@
 # Imports
 from random import choices
-import sys
 from typing import Tuple, List
 from ..entities.Data import Data
 from ..entities.Constant import Constant
@@ -91,7 +90,7 @@ class GeneticAlgorithm():
         print(f'GENERATION {generation_id}')
         print("=================")
         print(f'Avg. Fitness: {avg_fitness}')
-        print(f'Best. Fitness: {best_fitness}')
+        print(f'Best. Fitness: {best_fitness}, conflicts: {len(sorted_population[0].get_conflicts())}')
         print(f'Worst. Fitness: {worst_fitness}')
         print("")
 
@@ -101,15 +100,6 @@ class GeneticAlgorithm():
             key=lambda s: s.get_value(),
             reverse=True
         )
-
-    # write schedule to output file
-    def pipe_to_output(self, genome: Schedule):
-        schedule = [g for g in genome.list if g is not None]
-        schedule = sorted(schedule, key=lambda g: (g.day.value, g.time.value))
-        with open('output.out', 'w') as f:
-            sys.stdout = f
-            for g in schedule:
-                print(f'Day {g.day.value + 1} -- {g.time.clock_start} to {g.time.clock_end} -- {g.program.name} -- {g.coach.name}')
 
     # run algorithm
     def run(self) -> None:
@@ -131,7 +121,5 @@ class GeneticAlgorithm():
                 next_generation += [offspring_a, offspring_b]
             self._population = next_generation
             self._sort_population()
-        # Get best schedule   
-        best = self._population[0]
-        best.get_conflicts()
-        self.pipe_to_output(best)
+        # get best schedule and save output
+        self._population[0].save_to_file()
