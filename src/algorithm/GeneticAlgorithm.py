@@ -12,7 +12,7 @@ class GeneticAlgorithm():
         # initialize data
         self._data = data
         self._data.load()
-        # current population
+        # current population sorted by fitness in descending order
         self._population: List[Schedule] = []
         # parameters
         self._max_fitness: int = 1000000
@@ -29,6 +29,7 @@ class GeneticAlgorithm():
                     [self._data.get_rnd_course() for _ in range(Constant.MAX_MONTH_PROGRAM_COUNT)]
                 )
             )
+        self._sort_population()
 
     # randomly select parents from the current population, favor those who have higher fitness
     def selection_func(self) -> Tuple[Schedule, Schedule]:
@@ -94,7 +95,14 @@ class GeneticAlgorithm():
         print(f'Worst. Fitness: {worst_fitness}')
         print("")
 
-    # write genome to output file
+    def _sort_population(self) -> None:
+        self._population = sorted(
+            self._population,
+            key=lambda s: s.get_value(),
+            reverse=True
+        )
+
+    # write schedule to output file
     def pipe_to_output(self, genome: Schedule):
         schedule = [g for g in genome.list if g is not None]
         schedule = sorted(schedule, key=lambda g: (g.day.value, g.time.value))
@@ -109,17 +117,11 @@ class GeneticAlgorithm():
         for i in range(self._max_iteration):
             # print current population
             self._printer_default(self._population, i)
-            # sort current population by fitness
-            population = sorted(
-                self._population,
-                key=lambda s: s.get_value(),
-                reverse=True
-            )
             # exit if max fitness is achieved
-            if population[0].get_value() >= self._max_fitness:
+            if self._population[0].get_value() >= self._max_fitness:
                 break
             # auto carryover two best schedules to next generation
-            next_generation = population[0:2]
+            next_generation = self._population[0:2]
             # populate next generation
             for _ in range(int(self._population_size / 2 ) - 1):
                 parents = self.selection_func()
@@ -127,12 +129,9 @@ class GeneticAlgorithm():
                 offspring_a.mutate(self._data.get_rnd_course)
                 offspring_b.mutate(self._data.get_rnd_course)
                 next_generation += [offspring_a, offspring_b]
-            population = next_generation
+            self._population = next_generation
+            self._sort_population()
         # Get best schedule   
-        best = sorted(
-            self._population,
-            key=lambda s: s.get_value(),
-            reverse=True
-        )[0]
+        best = self._population[0]
         best.get_conflicts()
         self.pipe_to_output(best)
