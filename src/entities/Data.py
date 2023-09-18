@@ -51,7 +51,7 @@ class Data:
     def _add_coach_qualification(self):
         with open('data/processed/constraints.csv', 'r') as csv_file:
             for row in csv.DictReader(csv_file):
-                # Find coach in coaches array
+                # find coach in coaches array
                 coach: None | Coach = None
                 for c in self.coaches:
                     if (c.id == row['coach']):
@@ -59,19 +59,19 @@ class Data:
                         break
                 if coach is None:
                     continue
-                # Add programs to coach
+                # add programs to coach
                 for p in self.programs:
                     if (p.id in row['programs'].split(',')):
                         coach.add_program(p)
 
     def load(self):
-        # Load data
+        # load data
         self._parse_studio()
         self._parse_time()
         self._parse_day()
         self._parse_program()
         self._parse_coach()
-        # Add coach qualification
+        # add coach qualification
         self._add_coach_qualification()
         
     def get_rnd_course(self):
