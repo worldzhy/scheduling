@@ -8,7 +8,7 @@ def main():
     # Define algorithm to use
     algo = GeneticAlgorithm(data)
     # Run algorithm 
-    algo.configure(max_iteration=10)
+    algo.configure()
     algo.run()
 
 try:

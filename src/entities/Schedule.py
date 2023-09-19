@@ -17,31 +17,33 @@ class Schedule:
 
     # calculate the value of the current schedule
     def get_value(self) -> float:
-        timeslots: List[List[int]] = [[0 for _ in range(Constant.SLOTS_PER_DAY_NUM)] for _ in range(Constant.DAYS_NUM)]
-        for s in self.list:
-            if s is not None:
-                day = s.day.value
-                time = s.time.num_start
-                duration = s.program.duration
-                isOutOfBounds = False
-                for time_specific in range(duration // Constant.RESOLUTION_IN_MINUTES):
-                    if (time + time_specific >= len(timeslots[day])):
-                        isOutOfBounds = True
-                        break
-                if isOutOfBounds == False:
-                    for time_specific in range(duration // Constant.RESOLUTION_IN_MINUTES):
-                        timeslots[day][time + time_specific] += 1
-        sum = 0
-        for day in timeslots:
-            for freq in day:
-                if (freq == 0):
-                    sum += 0
-                if (freq == 1):
-                    sum += 10
-                else: 
-                    sum += -freq
+        sum = self._get_value_conflicts()
         return sum
+    
+    # get value for 
+    def _get_value_conflicts(self) -> float:
+        score = 0
+        total = sum(1 for s in self.list if s is not None)
+        for s1 in self.list:
+            if (s1 is None):
+                continue
+            hasConflict = False
+            for s2 in self.list:
+                if (s2 is None):
+                    continue
+                if (s1 != s2 and self._is_overlap(s1, s2)): # Has conflict
+                    hasConflict = True
+                    break
+            if (hasConflict == False):
+                score += 1
+        return score / total
 
+    # check if two courses overlap
+    def _is_overlap(self, course1: Course, course2: Course) -> bool:
+        isDaySame = course1.day.id == course2.day.id
+        isTimeOverlap = course1.time.num_end >= course2.time.num_start and course2.time.num_end >= course1.time.num_start
+        return isDaySame and isTimeOverlap
+    
     # get conflicts
     def get_conflicts(self) -> List[int]:
         # initialize list of conflicts
