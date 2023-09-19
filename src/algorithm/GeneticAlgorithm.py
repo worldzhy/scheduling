@@ -2,6 +2,7 @@
 import copy
 from random import choices
 from typing import Tuple, List
+from matplotlib import pyplot
 from ..entities.Data import Data
 from ..entities.Constant import Constant
 from ..entities.Course import Course
@@ -20,6 +21,7 @@ class GeneticAlgorithm():
         self._population_size: int = 10 
         self._mutation_rate: float = 0.3 
         self._num_crossover_points: int = 2
+        self._visualize_fitness: bool = True
     
     # generate random population of size _population_size
     def populate_func(self) -> None:
@@ -74,13 +76,15 @@ class GeneticAlgorithm():
         max_iteration: None | int = None,
         population_size: None | int = None,
         mutation_rate: None | float = None,
-        num_crossover_points: None | int = None
+        num_crossover_points: None | int = None,
+        visualize_fitness: None | bool = None
     ) -> None:
         self._max_fitness = max_fitness if max_fitness is not None else self._max_fitness
         self._max_iteration = max_iteration if max_iteration is not None else self._max_iteration
         self._population_size = population_size if population_size is not None else self._population_size 
         self._mutation_rate = mutation_rate if mutation_rate is not None else self._mutation_rate
         self._num_crossover_points = num_crossover_points if num_crossover_points is not None else self._num_crossover_points
+        self._visualize_fitness = visualize_fitness if visualize_fitness is not None else self._visualize_fitness
 
     # printer function
     def _printer_default(self, population: List[Schedule], generation_id: int) -> None:
@@ -88,6 +92,9 @@ class GeneticAlgorithm():
         avg_fitness = sum([genome.get_value() for genome in population]) / len(population)
         best_fitness = sorted_population[0].get_value()
         worst_fitness = sorted_population[-1].get_value()
+        if (self._visualize_fitness):
+            pyplot.scatter(generation_id, best_fitness, color='black')
+            pyplot.pause(0.05)
         print(f'GENERATION {generation_id}')
         print("=================")
         print(f'Avg. Fitness: {avg_fitness}')
@@ -124,3 +131,5 @@ class GeneticAlgorithm():
             self._sort_population()
         # get best schedule and save output
         self._population[0].save_to_file()
+        if (self._visualize_fitness):
+            pyplot.show()

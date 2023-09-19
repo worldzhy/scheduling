@@ -17,23 +17,27 @@ class Schedule:
 
     # calculate the value of the current schedule
     def get_value(self) -> float:
-        sum = self._get_value_conflicts()
+        sum = self._get_value_no_conflicts()
         return sum
     
     # get value for 
-    def _get_value_conflicts(self) -> float:
+    def _get_value_no_conflicts(self) -> float:
         score = 0
         total = sum(1 for s in self.list if s is not None)
         for s1 in self.list:
+            # ignore None
             if (s1 is None):
                 continue
             hasConflict = False
             for s2 in self.list:
+                # ignore None
                 if (s2 is None):
                     continue
-                if (s1 != s2 and self._is_overlap(s1, s2)): # Has conflict
+                # if course is different and daya and time overlaps, then has conflict
+                if (s1 != s2 and self._is_overlap(s1, s2)):
                     hasConflict = True
                     break
+            # if course has n conflict, add one point
             if (hasConflict == False):
                 score += 1
         return score / total
