@@ -7,7 +7,7 @@ from .Course import Course
 class Schedule:
     def __init__(self, list: List[Course | None]):
         # list of courses that makes up the schedule
-        self.list = list
+        self.list: List[Course | None] = list
 
     # mutate the schedule
     def mutate(self, gen_course: Callable[[], Course | None], mutation_rate: float = 0.4):
@@ -21,7 +21,7 @@ class Schedule:
         for s in self.list:
             if s is not None:
                 day = s.day.value
-                time = s.time.value
+                time = s.time.num_start
                 duration = s.program.duration
                 isOutOfBounds = False
                 for time_specific in range(duration // Constant.RESOLUTION_IN_MINUTES):
@@ -50,11 +50,11 @@ class Schedule:
         timeslots: List[List[int]] = [[False for _ in range(Constant.SLOTS_PER_DAY_NUM)] for _ in range(Constant.DAYS_NUM)]
         # remove blank slots and sort schedule by day and time
         schedule = [s for s in self.list if s is not None]
-        schedule = sorted(schedule, key=lambda s: (s.day.value, s.time.value))
+        schedule = sorted(schedule, key=lambda s: (s.day.value, s.time.num_start))
         # check for conflicts one by one
         for idx, s in enumerate(schedule):
             day = s.day.value
-            time = s.time.value
+            time = s.time.num_start
             duration = s.program.duration
             # ignore courses that is out of bounds
             isOutOfBounds = False
@@ -75,9 +75,9 @@ class Schedule:
     # write schedule to output file
     def save_to_file(self, filename: str = 'output.out'):
         schedule = [c for c in self.list if c is not None]
-        schedule = sorted(schedule, key=lambda c: (c.day.value, c.time.value))
+        schedule = sorted(schedule, key=lambda c: (c.day.value, c.time.num_start))
         with open(filename, 'w') as f:
             sys.stdout = f
             for c in schedule:
-                print(f'Day {c.day.value + 1} -- {c.time.clock_start} to {c.time.clock_end} -- {c.program.name} -- {c.coach.name}')
+                print(f'Day {c.day.value + 1} -- {c.time.clock_start} to {c.time.clock_end} -- {c.program.name} {c.program.duration} mins -- {c.coach.name}')
             sys.stdout = sys.__stdout__

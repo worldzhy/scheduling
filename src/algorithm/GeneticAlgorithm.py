@@ -1,4 +1,5 @@
 # Imports
+import copy
 from random import choices
 from typing import Tuple, List
 from ..entities.Data import Data
@@ -42,8 +43,8 @@ class GeneticAlgorithm():
 
     # generate two offsprings from parents
     def crossover_func(self, parents: Tuple[Schedule, Schedule]) -> Tuple[Schedule, Schedule]:
-        parent_a = parents[0].list
-        parent_b = parents[1].list
+        parent_a = copy.deepcopy(parents[0].list)
+        parent_b = copy.deepcopy(parents[1].list)
         # generate random crossover points
         crossover_points = sorted(
             choices(range(1, len(parent_a)),
@@ -116,8 +117,8 @@ class GeneticAlgorithm():
             for _ in range(int(self._population_size / 2 ) - 1):
                 parents = self.selection_func()
                 offspring_a, offspring_b = self.crossover_func(parents)
-                offspring_a.mutate(self._data.get_rnd_course)
-                offspring_b.mutate(self._data.get_rnd_course)
+                offspring_a.mutate(self._data.get_rnd_course, self._mutation_rate) 
+                offspring_b.mutate(self._data.get_rnd_course, self._mutation_rate)
                 next_generation += [offspring_a, offspring_b]
             self._population = next_generation
             self._sort_population()

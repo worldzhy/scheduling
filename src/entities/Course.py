@@ -1,3 +1,4 @@
+from .Constant import Constant
 from .Coach import Coach
 from .Day import Day
 from .Program import Program
@@ -12,3 +13,7 @@ class Course():
         self.time = time
         # incoporate end time
         self.time.add_clock_end(self.program.duration)
+
+    # checks if end time is beyond timeslot
+    def isOutOfBound(self) -> bool:
+        return self.time.num_end >= Constant.SLOTS_PER_DAY_NUM
