@@ -13,7 +13,9 @@ class Constant:
     MIN_PROGRAM_DURATION = 30 + 10
     # highest program duration in minutes
     MAX_PROGRAM_DURATION = 65 + 10
-    # naximum number of programs per day
+    # maximum number of programs on a month
     MAX_MONTH_PROGRAM_COUNT = math.floor((DAY_MINUTES / MIN_PROGRAM_DURATION) * DAYS_NUM)
+    # maximum number of programs on a day
+    MAX_DAY_PROGRAM_COUNT = math.floor(DAY_MINUTES / MIN_PROGRAM_DURATION)
     # fitness adjustment constant
     FITNESS_ADJ = (MAX_PROGRAM_DURATION // RESOLUTION_IN_MINUTES) * MAX_MONTH_PROGRAM_COUNT

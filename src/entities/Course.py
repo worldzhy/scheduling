@@ -16,4 +16,8 @@ class Course():
 
     # checks if end time is beyond timeslot
     def isOutOfBound(self) -> bool:
-        return self.time.num_end >= Constant.SLOTS_PER_DAY_NUM
+        return self.time.num_end > Constant.SLOTS_PER_DAY_NUM
+
+    # change the day of the course
+    def update_day(self, day: Day) -> None:
+        self.day = day

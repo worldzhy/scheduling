@@ -21,16 +21,37 @@ class GeneticAlgorithm():
         self._population_size: int = 10 
         self._mutation_rate: float = 0.3 
         self._num_crossover_points: int = 2
-        self._visualize_fitness: bool = True
+        self._visualize_fitness: bool = False
     
+    def gen_courses_for_day(self, day: int) -> List[Course]:
+        dayCourses: List[Course] = []
+        nextFreeTimeslot: int = 0
+        while (nextFreeTimeslot - 1 < Constant.SLOTS_PER_DAY_NUM - (Constant.MIN_PROGRAM_DURATION // Constant.RESOLUTION_IN_MINUTES)):
+            # TO DO: Make it make more efficient by choosing only programs that will fit timeslot
+            while (True):
+                course = Course(
+                    self._data.get_program(),
+                    self._data.get_coach(),
+                    self._data.get_day('D'+ str(day)),
+                    self._data.get_time('T' + str(nextFreeTimeslot))
+                )
+                if (course.isOutOfBound() == False):
+                    dayCourses.append(course)
+                    nextFreeTimeslot = course.time.num_end
+                    break
+        return dayCourses
+
+    # generate genome
+    def generate_genome(self) -> Schedule:
+        courses: List[List[Course]] = []
+        for i in range(Constant.DAYS_NUM):
+            courses.append(self.gen_courses_for_day(i))
+        return Schedule(courses)
+        
     # generate random population of size _population_size
     def populate_func(self) -> None:
         for _ in range(self._population_size):
-            self._population.append(
-                Schedule(
-                    [self._data.get_rnd_course() for _ in range(Constant.MAX_MONTH_PROGRAM_COUNT)]
-                )
-            )
+            self._population.append(self.generate_genome())
         self._sort_population()
 
     # randomly select parents from the current population, favor those who have higher fitness
@@ -45,16 +66,16 @@ class GeneticAlgorithm():
 
     # generate two offsprings from parents
     def crossover_func(self, parents: Tuple[Schedule, Schedule]) -> Tuple[Schedule, Schedule]:
-        parent_a = copy.deepcopy(parents[0].list)
-        parent_b = copy.deepcopy(parents[1].list)
+        parent_a = copy.deepcopy(parents[0].course_list)
+        parent_b = copy.deepcopy(parents[1].course_list)
         # generate random crossover points
         crossover_points = sorted(
             choices(range(1, len(parent_a)),
             k = min(self._num_crossover_points, len(parent_a) - 1))
         )
         # initialize offsprings
-        offspring_1: List[Course | None] = []
-        offspring_2: List[Course | None] = []
+        offspring_1: List[List[Course]] = []
+        offspring_2: List[List[Course]] = []
         # populate offsprings
         current_parent = 1
         for i in range(len(parent_a)):
@@ -67,7 +88,13 @@ class GeneticAlgorithm():
             else:
                 offspring_1.append(parent_b[i])
                 offspring_2.append(parent_a[i])
-        return Schedule(offspring_1), Schedule(offspring_2)
+        # assemble schedule
+        s1 = Schedule(offspring_1)
+        s2 = Schedule(offspring_2)
+        # index of list of courses should correspond to the day
+        s1.repair_days_to_match_index(self._data.get_day)
+        s2.repair_days_to_match_index(self._data.get_day)
+        return s1, s2 
     
     # configure parameters of the algorithm
     def configure(
@@ -93,8 +120,8 @@ class GeneticAlgorithm():
         best_fitness = sorted_population[0].get_value()
         worst_fitness = sorted_population[-1].get_value()
         if (self._visualize_fitness):
-            pyplot.scatter(generation_id, best_fitness, color='black')
-            pyplot.pause(0.05)
+            pyplot.scatter(generation_id, best_fitness, color='black') # type: ignore
+            pyplot.pause(0.05) # type: ignore
         print(f'GENERATION {generation_id}')
         print("=================")
         print(f'Avg. Fitness: {avg_fitness}')
@@ -124,12 +151,12 @@ class GeneticAlgorithm():
             for _ in range(int(self._population_size / 2 ) - 1):
                 parents = self.selection_func()
                 offspring_a, offspring_b = self.crossover_func(parents)
-                offspring_a.mutate(self._data.get_rnd_course, self._mutation_rate) 
-                offspring_b.mutate(self._data.get_rnd_course, self._mutation_rate)
+                offspring_a.mutate(self.gen_courses_for_day, self._mutation_rate) 
+                offspring_b.mutate(self.gen_courses_for_day, self._mutation_rate)
                 next_generation += [offspring_a, offspring_b]
             self._population = next_generation
             self._sort_population()
         # get best schedule and save output
         self._population[0].save_to_file()
         if (self._visualize_fitness):
-            pyplot.show()
+            pyplot.show() # type: ignore

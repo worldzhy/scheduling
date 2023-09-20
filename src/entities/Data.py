@@ -1,10 +1,9 @@
 import copy
 import csv
-from random import choices, uniform
+from random import choices
 from typing import List
 from .Constant import Constant
 from .Coach import Coach
-from .Course import Course
 from .Day import Day
 from .Program import Program
 from .Studio import Studio
@@ -35,6 +34,19 @@ class Data:
             for row in csv.DictReader(csv_file):
                self.studios.append(Studio(row['id'], row['name']))
 
+    # get studio randomly or by id
+    def get_studio(self, id: str | None = None) -> Studio:
+        if id is None:
+            # return random studio
+            return copy.deepcopy(choices(self.studios, k = 1)[0])
+        else:
+            for s in self.studios:
+                # return studio with matching id if found
+                if (s.id == id):
+                    return copy.deepcopy(s)
+            # if no matching id found, raise exception
+            raise Exception(f'Studio {id} not found')
+
     # populates time
     def _parse_time(self):
         """
@@ -46,6 +58,19 @@ class Data:
         """
         for time in range(Constant.SLOTS_PER_DAY_NUM):
             self.times.append(Time('T' + str(time), int(time)))
+
+    # get time randomly or by id
+    def get_time(self, id: str | None = None) -> Time:
+        if id is None:
+            # return random time
+            return copy.deepcopy(choices(self.times, k = 1)[0])
+        else:
+            for t in self.times:
+                # return time with matching id if found
+                if (t.id == id):
+                    return copy.deepcopy(t)
+            # if no matching id found, raise exception
+            raise Exception(f'Time {id} not found')
 
     # populates day
     def _parse_day(self):
@@ -59,17 +84,56 @@ class Data:
         for day in range(Constant.DAYS_NUM):
             self.days.append(Day('D' + str(day), int(day)))
 
+    # get day randomly or by id
+    def get_day(self, id: str | None = None) -> Day:
+        if id is None:
+            # return random day
+            return copy.deepcopy(choices(self.days, k = 1)[0])
+        else:
+            for d in self.days:
+                # return day with matching id if found
+                if (d.id == id):
+                    return copy.deepcopy(d)
+            # if no matching id found, raise exception
+            raise Exception(f'Day {id} not found')
+
     # populates program
     def _parse_program(self):
         with open(self._program_csv, 'r') as csv_file:
             for row in csv.DictReader(csv_file):
                 self.programs.append(Program(row['id'], row['name'], int(row['duration'])))
 
+    # get program randomly or by id
+    def get_program(self, id: str | None = None) -> Program:
+        if id is None:
+            # return random program
+            return copy.deepcopy(choices(self.programs, k = 1)[0])
+        else:
+            for p in self.programs:
+                # return program with matching id if found
+                if (p.id == id):
+                    return copy.deepcopy(p)
+            # if no matching id found, raise exception
+            raise Exception(f'Program {id} not found')
+
     # populates coach
     def _parse_coach(self):
         with open(self._coach_csv, 'r') as csv_file:
             for row in csv.DictReader(csv_file):
                self.coaches.append(Coach(row['id'], row['name']))
+
+    # get coach randomly or by id
+    def get_coach(self, id: str | None = None) -> Coach:
+        if id is None:
+            # return random coach
+            return copy.deepcopy(choices(self.coaches, k = 1)[0])
+        else:
+            for c in self.coaches:
+                # return coach with matching id if found
+                if (c.id == id):
+                    return copy.deepcopy(c)
+            # if no matching id found, raise exception
+            raise Exception(f'Coach {id} not found')
 
     # populates coach qualification
     def _add_coach_qualification(self):
@@ -114,18 +178,3 @@ class Data:
         # add coach qualification
         self._add_coach_qualification()
         
-    # randomly generates a course    
-    def get_rnd_course(self) -> Course | None:
-        if (uniform(0, 1) > self._no_sched_probability):
-            for _ in range(self._gen_random_course_max_attempt):
-                new_course = Course(
-                    copy.deepcopy(choices(self.programs, k = 1)[0]),
-                    copy.deepcopy(choices(self.coaches, k = 1)[0]),
-                    copy.deepcopy(choices(self.days, k = 1)[0]),
-                    copy.deepcopy(choices(self.times, k = 1)[0])
-                )
-                if (new_course.isOutOfBound() == False):
-                    return new_course
-            return None
-        else:
-            return None

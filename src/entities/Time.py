@@ -15,7 +15,7 @@ class Time:
 
     # given time index, returns time in string
     def _convert_to_time(self, time_index: int) -> str:
-        if 0 <= time_index <= Constant.SLOTS_PER_DAY_NUM - 1:
+        if 0 <= time_index <= Constant.SLOTS_PER_DAY_NUM:
             hours = 5 + time_index // 12
             minutes = (time_index % 12) * 5
             period = "AM" if hours < 12 else "PM"
