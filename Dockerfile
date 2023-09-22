@@ -11,4 +11,4 @@ COPY . .
 RUN pip install -r requirements.txt
 
 # CMD instruction should be used to run the software
-CMD [ "python", "./main.py"]
+CMD [ "python", "./server.py"]

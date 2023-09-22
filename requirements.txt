@@ -1,5 +1,6 @@
-ortools
-pandas
+flask
+waitress
+numpy
 matplotlib
-scipy
-scikit-learn
+random
+typing
