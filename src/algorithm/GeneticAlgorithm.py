@@ -23,7 +23,7 @@ class GeneticAlgorithm():
         self._mutation_rate: float = 0.3 
         self._num_crossover_points: int = 2
         self._visualize_fitness: bool = False
-        self._dubug: bool = False
+        self._debug: bool = False
     
     def gen_courses_for_day(self, day: int) -> List[Course]:
         dayCourses: List[Course] = []
@@ -107,7 +107,7 @@ class GeneticAlgorithm():
         mutation_rate: None | float = None,
         num_crossover_points: None | int = None,
         visualize_fitness: None | bool = None,
-        dubug: None | bool = None
+        debug: None | bool = None
     ) -> None:
         self._max_fitness = max_fitness if max_fitness is not None else self._max_fitness
         self._max_iteration = max_iteration if max_iteration is not None else self._max_iteration
@@ -115,7 +115,7 @@ class GeneticAlgorithm():
         self._mutation_rate = mutation_rate if mutation_rate is not None else self._mutation_rate
         self._num_crossover_points = num_crossover_points if num_crossover_points is not None else self._num_crossover_points
         self._visualize_fitness = visualize_fitness if visualize_fitness is not None else self._visualize_fitness
-        self._dubug = dubug if dubug is not None else self._dubug
+        self._debug = debug if debug is not None else self._debug
 
     # printer function
     def _printer_default(self, population: List[Schedule], generation_id: int) -> None:
@@ -145,7 +145,7 @@ class GeneticAlgorithm():
         self.populate_func()
         for i in range(self._max_iteration):
             # print current population
-            if self._dubug:
+            if self._debug:
                 self._printer_default(self._population, i)
             # exit if max fitness is achieved
             if self._population[0].get_value() >= self._max_fitness:
