@@ -2,6 +2,7 @@ version: "3"
 services:
   model:
     build: .
+    env_file: .env
     volumes:
       - ./:/usr/src/app
     ports:

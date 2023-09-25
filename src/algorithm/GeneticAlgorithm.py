@@ -145,7 +145,7 @@ class GeneticAlgorithm():
         self.populate_func()
         for i in range(self._max_iteration):
             # print current population
-            if self._debug:
+            if self._debug == True:
                 self._printer_default(self._population, i)
             # exit if max fitness is achieved
             if self._population[0].get_value() >= self._max_fitness:

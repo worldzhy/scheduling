@@ -8,3 +8,5 @@ data/raw/*
 **/*.pyc
 # Test file
 test.py
+# env file
+.env
