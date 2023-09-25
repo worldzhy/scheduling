@@ -2,16 +2,16 @@
 
 ## Steps to run (To be improved)
 
-1. Build container and image
+1. Build image
 
    ```bash
-   docker-compose up --build
+   docker build -t scheduling:latest .
    ```
 
-2. Execute
+2. Run image
 
    ```bash
-   docker run {serviceName}
+   docker run -d --name scheduling -p 3002:8080 scheduling:latest
    ```
 
 ## Project Structure

@@ -4,6 +4,9 @@ FROM python:latest
 # Working directory
 WORKDIR /usr/src/app
 
+# Environment variables
+ENV APP_DEBUG=True
+
 # COPY the remote file at working directory in container
 COPY . .
 
