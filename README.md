@@ -1,17 +1,12 @@
 # Scheduling Model
 
-## Steps to run (To be improved)
+## Steps to run
 
-1. Build image
-
-   ```bash
-   docker build -t scheduling:latest .
-   ```
-
-2. Run image
+1. Start app in docker
 
    ```bash
-   docker run -d --name scheduling -p 3002:8080 scheduling:latest
+   chmod +x start.sh
+   ./start.sh
    ```
 
 ## Project Structure
