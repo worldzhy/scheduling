@@ -10,3 +10,5 @@ data/raw/*
 test.py
 # env file
 .env
+# python env
+.venv
