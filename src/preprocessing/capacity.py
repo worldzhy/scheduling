@@ -3,8 +3,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+# Constants
+DAYS_OF_WEEK = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
+
 # Read data
-data = pd.read_csv('data/raw/tblclasses.csv', usecols=['CLASSDATESTART', 'LOCATIONID', 'CLASSID', 'STUDIOID', 'CLASSTRAINERID', 'CLASSCAPACITY', 'WAITLISTSIZE', 'DAYSUNDAY', 'DAYMONDAY', 'DAYTUESDAY', 'DAYWEDNESDAY', 'DAYTHURSDAY', 'DAYFRIDAY', 'DAYSATURDAY'], index_col=False)
+data = pd.read_csv(
+    'data/raw/tblclasses.csv',
+    usecols = ['CLASSDATESTART', 'LOCATIONID', 'CLASSID', 'STUDIOID', 'CLASSTRAINERID', 'CLASSCAPACITY', 'WAITLISTSIZE', 'DAYSUNDAY', 'DAYMONDAY', 'DAYTUESDAY', 'DAYWEDNESDAY', 'DAYTHURSDAY', 'DAYFRIDAY', 'DAYSATURDAY'],
+    index_col=False
+)
 
 # Rename the selected columns
 data.rename(
@@ -14,6 +21,8 @@ data.rename(
         'CLASSID': 'classid',
         'STUDIOID': 'studio',
         'CLASSTRAINERID': 'coach',
+        'CLASSCAPACITY': 'capacity',
+        'WAITLISTSIZE': 'waitlist',
         'DAYSUNDAY': 'sunday',
         'DAYMONDAY': 'monday',
         'DAYTUESDAY': 'tuesday',
@@ -21,75 +30,77 @@ data.rename(
         'DAYTHURSDAY': 'thursday',
         'DAYFRIDAY': 'friday',
         'DAYSATURDAY': 'saturday',
-        'CLASSCAPACITY': 'capacity',
-        'WAITLISTSIZE': 'waitlist',
     },
     inplace = True
 )
 
-# Date as date
-data['date'] = pd.to_datetime(data['date'], errors='coerce').dt.date
+# Convert the date column to datetime
+data['date'] = pd.to_datetime(data['date'], errors = 'coerce').dt.date
 
-# Aggregate days in single column
+# Aggregate days in single column called day
 data['day'] = None
-days_of_week = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
-for day in days_of_week:
+for day in DAYS_OF_WEEK:
     data.loc[data[day], 'day'] = day
-data.drop(columns=days_of_week, inplace=True)
+data.drop(columns = DAYS_OF_WEEK, inplace = True)
 
-# Add class names
-classname_tbl = pd.read_csv('data/interim/classname.csv')
-data = data.merge(classname_tbl, on='classid', how='left')
+# Add program column
+data = data.merge(pd.read_csv('data/interim/classname.csv'), on = 'classid', how = 'left')
 data.rename(
-    columns = {
-        'classname': 'program',
-    },
+    columns = { 'classname': 'program' },
     inplace = True
 )
 
 # Create demand column
 data['demand'] = data['capacity'] + data['waitlist']
-data.drop(columns=['capacity', 'waitlist'], inplace=True)
-
-# Move capacity to be the rightmost columns
-data = data[['studio', 'date', 'location', 'program', 'coach',  'day', 'demand']]
+data.drop(columns=['capacity', 'waitlist'], inplace = True)
 
 # Drop coach for now (not part of the independent variable)
-data.drop(columns=['coach'], inplace=True)
+data.drop(columns = ['coach'], inplace = True)
 
-# Remove nans
+# Remove rows with NA
 data = data.dropna()
 
-# Use only location == 4 and program == fullbody for now
-uniqueLocations = data['location'].unique()
-uniquePrograms = data['program'].unique()
+# Rearrange columns
+data = data[['date', 'studio', 'location', 'day', 'program', 'demand']]
 
-df = pd.DataFrame()
-for loc in uniqueLocations:
-    for prog in uniquePrograms:
-        dataTemp = data[data['location'] == loc]
-        dataTemp = data[data['program'] == prog]
+# Get unique locations and unique programs
+locations = data['location'].unique()
+programs = data['program'].unique()
 
-        # Group by the 'date' column and calculate the average of 'value'
-        dataTemp = dataTemp.groupby('date').agg({
-            'studio': 'first',  # Take the first value (mode for categorical)
-            'location': 'first',  # Take the first value (mode for categorical)
-            'program': 'first',  # Take the first value (mode for categorical)
-            'day': 'first',  # Take the first value (mode for categorical)
-            'demand': 'mean'  # Calculate the mean for numerical
+# Create dataframe for processed data
+data_processed = pd.DataFrame()
+
+# Aggregate rows by date and group by program-location pair
+for loc in locations:
+    for prog in programs:
+        # Filter data by location and program
+        data_temp = data[data['location'] == loc]
+        data_temp = data[data['program'] == prog]
+
+        # Group by the 'date' column and calculate the average of 'demand'
+        data_temp = data_temp.groupby('date').agg({
+            'studio': 'first',  # Agregate by taking the first value
+            'location': 'first',  # Agregate by taking the first value
+            'program': 'first',  # Agregate by taking the first value
+            'day': 'first',  # Agregate by taking the first value
+            'demand': 'mean'  # Agregate by taking the mean
         }).reset_index()
 
-        dataTemp['group'] = f'{prog}-{loc}'
-        dataTemp = dataTemp.sort_values(by='date')
+        # Create new column called group
+        data_temp['group'] = f'{prog}-{loc}'
 
-        df = pd.concat([df, dataTemp], ignore_index=True)
+        # Sort rows by date
+        data_temp = data_temp.sort_values(by = 'date')
 
-np.savetxt('data/processed/capacity.csv', df, delimiter=',', header='date,studio,location,program,day,demand,group', fmt='%s', comments='')
+        # Concatenate current data group to main processed data
+        data_processed = pd.concat([data_processed, data_temp], ignore_index = True)
 
-
-# Explore data
-# print('Number of rows:', data.shape[0])
-# print('Unique date:', len(data['date'].unique()))
-# print(data.head())
-
-# Save
+# Save processed data
+np.savetxt(
+    'data/processed/capacity.csv',
+    data_processed,
+    delimiter = ',',
+    header = 'date, studio, location, day, program, demand, group',
+    fmt = '%s',
+    comments = ''
+)
