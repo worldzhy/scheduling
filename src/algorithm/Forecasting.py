@@ -1,28 +1,42 @@
 # type: ignore
 import pandas as pd
-from prophet.plot import plot_plotly, plot_components_plotly
+from datetime import datetime, timedelta
 from prophet import Prophet
 
+def generate_future_dates(start_date, end_date):
+    # Generate a list of dates for September 2023
+    date_list = []
+    current_date = start_date
+    while current_date <= end_date:
+        date_list.append(pd.to_datetime(current_date.strftime('%Y-%m-%d')))
+        current_date += timedelta(days = 1)
+
+    # Create a dictionary with the list of dates
+    date_dict = {'ds': date_list}
+
+    # Return the dictionary
+    return pd.DataFrame(date_dict)
+
 ## import data
-data = pd.read_csv('data/interim/capacity-location4-programfullbody.csv')
+data = pd.read_csv('data/processed/capacity.csv')
+
+# Use only one group for now
+data = data[data['group'] == 'fullbody-4']
 
 ## preprocess
 # date as datetime
-data=data[["date","demand"]]
-data.columns = ['ds','y']
+data = data[['date', 'demand']]
+data.columns = ['ds', 'y']
 data['ds'] = pd.to_datetime(data['ds'])
 
-# split train vs test
-test = data.iloc[len(data)-50:] # last 50
-train = data.iloc[:len(data)-50] # remaining
-print(train.head())
+# Generate future dates
+start_date = datetime(2023, 9, 1)
+end_date = datetime(2023, 9, 30)
+future_dates = generate_future_dates(start_date, end_date)
 
 # call prophet
 m = Prophet()
-m.fit(train)
-future = m.make_future_dataframe(periods=50) #MS for monthly, H for hourly
-forecast = m.predict(future)
+m.fit(data)
+forecast = m.predict(future_dates)
 
-forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].tail()
-
-m.plot(forecast)
+print(forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']])

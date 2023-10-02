@@ -61,7 +61,7 @@ data.drop(columns = ['coach'], inplace = True)
 data = data.dropna()
 
 # Rearrange columns
-data = data[['date', 'studio', 'location', 'day', 'program', 'demand']]
+data = data[['date', 'studio', 'location', 'program', 'day', 'demand']]
 
 # Get unique locations and unique programs
 locations = data['location'].unique()
@@ -100,7 +100,7 @@ np.savetxt(
     'data/processed/capacity.csv',
     data_processed,
     delimiter = ',',
-    header = 'date, studio, location, day, program, demand, group',
+    header = 'date,studio,location,program,day,demand,group',
     fmt = '%s',
     comments = ''
 )
