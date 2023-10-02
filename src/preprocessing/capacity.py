@@ -1,10 +1,10 @@
-# Imports
+# type: ignore
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
 # Read data
-data = pd.read_csv('data/raw/tblclasses.csv', usecols=['CLASSDATESTART', 'LOCATIONID', 'CLASSID', 'STUDIOID', 'CLASSTRAINERID', 'CLASSCAPACITY', 'WAITLISTSIZE', 'DAYSUNDAY', 'DAYMONDAY', 'DAYTUESDAY', 'DAYWEDNESDAY', 'DAYTHURSDAY', 'DAYFRIDAY', 'DAYSATURDAY'])
+data = pd.read_csv('data/raw/tblclasses.csv', usecols=['CLASSDATESTART', 'LOCATIONID', 'CLASSID', 'STUDIOID', 'CLASSTRAINERID', 'CLASSCAPACITY', 'WAITLISTSIZE', 'DAYSUNDAY', 'DAYMONDAY', 'DAYTUESDAY', 'DAYWEDNESDAY', 'DAYTHURSDAY', 'DAYFRIDAY', 'DAYSATURDAY'], index_col=False)
 
 # Rename the selected columns
 data.rename(
@@ -54,26 +54,42 @@ data.drop(columns=['capacity', 'waitlist'], inplace=True)
 # Move capacity to be the rightmost columns
 data = data[['studio', 'date', 'location', 'program', 'coach',  'day', 'demand']]
 
-# Use only location == 4 and program == fullbody for now
-data = data[data['location'] == 4]
-data = data[data['program'] == 'fullbody']
-
 # Drop coach for now (not part of the independent variable)
 data.drop(columns=['coach'], inplace=True)
 
-# Group by the 'date' column and calculate the average of 'value'
-data = data.groupby('date').agg({
-    'studio': 'first',  # Take the first value (mode for categorical)
-    'location': 'first',  # Take the first value (mode for categorical)
-    'program': 'first',  # Take the first value (mode for categorical)
-    'day': 'first',  # Take the first value (mode for categorical)
-    'demand': 'mean'  # Calculate the mean for numerical
-}).reset_index()
+# Remove nans
+data = data.dropna()
+
+# Use only location == 4 and program == fullbody for now
+uniqueLocations = data['location'].unique()
+uniquePrograms = data['program'].unique()
+
+df = pd.DataFrame()
+for loc in uniqueLocations:
+    for prog in uniquePrograms:
+        dataTemp = data[data['location'] == loc]
+        dataTemp = data[data['program'] == prog]
+
+        # Group by the 'date' column and calculate the average of 'value'
+        dataTemp = dataTemp.groupby('date').agg({
+            'studio': 'first',  # Take the first value (mode for categorical)
+            'location': 'first',  # Take the first value (mode for categorical)
+            'program': 'first',  # Take the first value (mode for categorical)
+            'day': 'first',  # Take the first value (mode for categorical)
+            'demand': 'mean'  # Calculate the mean for numerical
+        }).reset_index()
+
+        dataTemp['group'] = f'{prog}-{loc}'
+        dataTemp = dataTemp.sort_values(by='date')
+
+        df = pd.concat([df, dataTemp], ignore_index=True)
+
+np.savetxt('data/processed/capacity.csv', df, delimiter=',', header='date,studio,location,program,day,demand,group', fmt='%s', comments='')
+
 
 # Explore data
-print('Number of rows:', data.shape[0])
-print('Unique date:', len(data['date'].unique()))
-print(data.head())
+# print('Number of rows:', data.shape[0])
+# print('Unique date:', len(data['date'].unique()))
+# print(data.head())
 
 # Save
-np.savetxt('data/interim/capacity-location4-programfullbody.csv', data, delimiter=',', header='date,studio,location,program,day,demand', fmt='%s', comments='')
