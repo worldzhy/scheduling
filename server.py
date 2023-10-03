@@ -4,6 +4,7 @@ from flask import Flask, jsonify, request
 from dotenv import load_dotenv
 from src.algorithm.GeneticAlgorithm import GeneticAlgorithm
 from src.entities.Data import Data
+from marshmallow import Schema, fields, validates, ValidationError
 
 load_dotenv()
 app = Flask(__name__)
@@ -37,11 +38,35 @@ def post_schedule():
 @app.route('/forecast', methods=['POST'])
 def post_forecast():
     try:
+        # Schema of the body
+        class BodySchema(Schema):
+            studio = fields.String(required=True)
+            program = fields.String(required=True)
+            location = fields.String(required=True)
+
+            @validates('studio')
+            def validate_studio(self, value):
+                if not value.strip():
+                    raise ValidationError('studio cannot be an empty string')
+
+            @validates('program')
+            def validate_program(self, value):
+                if not value.strip():
+                    raise ValidationError('program cannot be an empty string')
+                
+            @validates('location')
+            def validate_location(self, value):
+                if not value.strip():
+                    raise ValidationError('location cannot be an empty string')
+        
+        # Parse and validate the request body
+        schema = BodySchema()
+        data = schema.load(request.json)
+
         # Get request body
-        data = request.json
-        studio = data.get('studio')
-        program = data.get('program')
-        location = data.get('location')
+        studio = data['studio']
+        program = data['program']
+        location = data['location']
 
         # Run model 
         res = forecast(studio, program, location)
