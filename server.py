@@ -1,6 +1,6 @@
 import os
 from src.algorithm.Forecasting import forecast
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from dotenv import load_dotenv
 from src.algorithm.GeneticAlgorithm import GeneticAlgorithm
 from src.entities.Data import Data
@@ -37,9 +37,16 @@ def post_schedule():
 @app.route('/forecast', methods=['POST'])
 def post_forecast():
     try:
+        # Get request body
+        data = request.json
+        studio = data.get('studio')
+        program = data.get('program')
+        location = data.get('location')
+
         # Run model 
-        res = forecast()
-        # return result
+        res = forecast(studio, program, location)
+
+        # Return result
         return jsonify(res), 200
     except Exception as e:
         # Catch any exception and access its error message
