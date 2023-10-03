@@ -21,22 +21,44 @@ def generate_future_dates(start_date, end_date):
 data = pd.read_csv('data/processed/capacity.csv')
 
 # Use only one group for now
-data = data[data['group'] == 'fullbody-4']
+groups = data['group'].unique()
 
-## preprocess
-# date as datetime
-data = data[['date', 'demand']]
-data.columns = ['ds', 'y']
-data['ds'] = pd.to_datetime(data['ds'])
+# Process by group
+forecasts = []   
+for group in groups:
+    # Filter data by group
+    data_temp = data[data['group'] == group]
 
-# Generate future dates
-start_date = datetime(2023, 9, 1)
-end_date = datetime(2023, 9, 30)
-future_dates = generate_future_dates(start_date, end_date)
+    ## Preprocess
+    # Date as datetime
+    data_temp = data_temp[['date', 'demand']]
+    data_temp.columns = ['ds', 'y']
+    data_temp['ds'] = pd.to_datetime(data_temp['ds'])
 
-# call prophet
-m = Prophet()
-m.fit(data)
-forecast = m.predict(future_dates)
+    # Generate future dates
+    start_date = datetime(2023, 9, 1)
+    end_date = datetime(2023, 9, 30)
+    future_dates = generate_future_dates(start_date, end_date)
 
-print(forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']])
+    # Call prophet
+    m = Prophet()
+    m.fit(data_temp)
+    forecast = m.predict(future_dates)
+
+    # Get only needed columns
+    forecast = forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
+
+    # Append to forecasts object
+    for index, row in forecast.iterrows():
+        forecasts.append({
+            'date': row['ds'],
+            'studio': '---',
+            'location': group.split('-')[1],
+            'program': group.split('-')[0],
+            'capacity': row['yhat'],
+            'capacity_lower': row['yhat_lower'],
+            'capacity_upper': row['yhat_upper'],
+        })
+
+# Print forecasts
+print(forecasts)
