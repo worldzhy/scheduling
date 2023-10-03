@@ -2,6 +2,16 @@
 import pandas as pd
 from datetime import datetime, timedelta
 from prophet import Prophet
+import calendar
+
+def days_in_month(year, month):
+    try:
+        # Use calendar.monthrange to get the number of days in the given month and year
+        _, num_days = calendar.monthrange(year, month)
+        return num_days
+    except ValueError:
+        return None  # Invalid input (e.g., month not in the range 1-12)
+
 
 def generate_future_dates(start_date, end_date):
     # Generate a list of dates for September 2023
@@ -17,7 +27,7 @@ def generate_future_dates(start_date, end_date):
     # Return the dictionary
     return pd.DataFrame(date_dict)
 
-def forecast(studio, program, location):
+def forecast(studio, program, location, year, month):
     ## import data
     data = pd.read_csv('data/processed/capacity.csv')
 
@@ -41,8 +51,8 @@ def forecast(studio, program, location):
     data['ds'] = pd.to_datetime(data['ds'])
 
     # Generate future dates
-    start_date = datetime(2023, 9, 1)
-    end_date = datetime(2023, 9, 30)
+    start_date = datetime(year, month, 1)
+    end_date = datetime(year, month, days_in_month(year, month))
     future_dates = generate_future_dates(start_date, end_date)
 
     # Call prophet

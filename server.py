@@ -43,6 +43,8 @@ def post_forecast():
             studio = fields.String(required=True)
             program = fields.String(required=True)
             location = fields.String(required=True)
+            month = fields.Integer(required=True)
+            year = fields.Integer(required=True)
 
             @validates('studio')
             def validate_studio(self, value):
@@ -67,9 +69,11 @@ def post_forecast():
         studio = data['studio']
         program = data['program']
         location = data['location']
+        year = data['year']
+        month = data['month']
 
         # Run model 
-        res = forecast(studio, program, location)
+        res = forecast(studio, program, location, year, month)
 
         # Return result
         return jsonify(res), 200
