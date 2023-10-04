@@ -3,7 +3,7 @@ import copy
 from random import choices
 from typing import Tuple, List
 from matplotlib import pyplot
-from ..entities.Result import Result
+from ..entities.Result import SchedulingResult
 from ..entities.Data import Data
 from ..entities.Constant import Constant
 from ..entities.Course import Course
@@ -141,7 +141,7 @@ class GeneticAlgorithm():
         )
 
     # run algorithm
-    def run(self) -> List[Result]:
+    def run(self) -> List[SchedulingResult]:
         self.populate_func()
         for i in range(self._max_iteration):
             # print current population

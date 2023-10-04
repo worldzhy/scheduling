@@ -1,7 +1,7 @@
 from random import uniform
 import sys
 from typing import Callable, List
-from .Result import Result
+from .Result import SchedulingResult
 from .Day import Day
 from .Constant import Constant
 from .Course import Course
@@ -100,8 +100,8 @@ class Schedule:
                     print(f'Day {c.day.value + 1} -- {c.time.clock_start} to {c.time.clock_end} -- {c.program.name} {c.program.duration} mins -- {c.coach.name}')
             sys.stdout = sys.__stdout__
 
-    def to_json(self) -> List[Result]:
-        result: List[Result] = []
+    def to_json(self) -> List[SchedulingResult]:
+        result: List[SchedulingResult] = []
         for day_course_list in self.course_list:
             for c in day_course_list:
                 result.append({

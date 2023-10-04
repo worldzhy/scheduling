@@ -1,5 +1,5 @@
 import os
-from src.algorithm.Forecasting import forecast
+from src.algorithm.Forecasting import Forecast
 from flask import Flask, jsonify, request
 from dotenv import load_dotenv
 from src.algorithm.GeneticAlgorithm import GeneticAlgorithm
@@ -73,7 +73,8 @@ def post_forecast():
         month = data['month']
 
         # Run model 
-        res = forecast(studio, program, location, year, month)
+        algo = Forecast(studio, program, location, year, month)
+        res = algo.run()
 
         # Return result
         return jsonify(res), 200
@@ -88,4 +89,4 @@ def post_forecast():
 if __name__ == '__main__':
     from waitress import serve
     port = 8080
-    serve(app, port=port)
+    serve(app, port = port)
