@@ -1,5 +1,5 @@
 # Deriving the latest base image
-FROM python:slim
+FROM python:latest
 
 # Working directory
 WORKDIR /usr/src/app
