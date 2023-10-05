@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Constants
-DAYS_OF_WEEK = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
+DAYS_OF_WEEK = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 
 # Read data
 data = pd.read_csv(
@@ -39,8 +39,8 @@ data['date'] = pd.to_datetime(data['date'], errors = 'coerce').dt.date
 
 # Aggregate days in single column called day
 data['day'] = None
-for day in DAYS_OF_WEEK:
-    data.loc[data[day], 'day'] = day
+for ind, day in enumerate(DAYS_OF_WEEK):
+    data.loc[data[day], 'day'] = ind + 1
 data.drop(columns = DAYS_OF_WEEK, inplace = True)
 
 # Add program column

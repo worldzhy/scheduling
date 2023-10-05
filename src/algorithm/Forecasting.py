@@ -24,15 +24,17 @@ class Forecast():
     def _generate_future_dates(self) -> pd.DataFrame:
         start_date = datetime(self._year, self._month, 1)
         end_date = datetime(self._year, self._month, self._get_days_in_month())
-        # generate a list of dates
+        # generate a list of dates and days
         date_list: List[datetime] = []
+        day_list: List[int] = []
         # start loop
         current_date = start_date
         while current_date <= end_date:
             date_list.append(pd.to_datetime(current_date.strftime('%Y-%m-%d')))
+            day_list.append(current_date.isoweekday())
             current_date += timedelta(days = 1)
         # return list of dates
-        return pd.DataFrame({'ds': date_list})
+        return pd.DataFrame({'ds': date_list, 'day': day_list})
 
     def run(self) -> List[ForecastResult]:
         # import data
@@ -48,14 +50,16 @@ class Forecast():
         # generate forecasts
         forecasts: List[ForecastResult] = []   
         # preprocess data
-        data = data[['date', 'demand']]
-        data.columns = ['ds', 'y']
+        data = data[['date', 'demand', 'day']]
+        data.columns = ['ds', 'y', 'day']
         data['ds'] = pd.to_datetime(data['ds'])
-        # generate future dates
-        future_dates = self._generate_future_dates()
         # call prophet
         m = Prophet()
+        m.add_regressor('day')
+        m.add_country_holidays(country_name = 'US')
         m.fit(data)
+        # generate future dates
+        future_dates = self._generate_future_dates()
         forecast = m.predict(future_dates)
 
         # get only needed columns
