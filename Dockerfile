@@ -1,8 +1,11 @@
 # Deriving the latest base image
-FROM python:latest
+FROM python:slim
 
 # Working directory
 WORKDIR /usr/src/app
+
+# Update
+RUN apt update
 
 # Environment variables
 ENV APP_DEBUG=True
