@@ -5,7 +5,7 @@ FROM python:latest
 WORKDIR /usr/src/app
 
 # Update
-RUN apt update
+RUN apk update && apk upgrade
 
 # Environment variables
 ENV APP_DEBUG=True
