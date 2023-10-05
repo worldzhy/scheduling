@@ -3,3 +3,5 @@ waitress
 numpy
 matplotlib
 python-dotenv
+marshmallow
+prophet
