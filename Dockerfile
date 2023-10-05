@@ -11,6 +11,7 @@ ENV APP_DEBUG=True
 COPY . .
 
 # Install any needed packages specified in requirements.txt
+RUN python -m pip3 cache purge
 RUN pip3 install -r requirements.txt --timeout 2000
 
 # CMD instruction should be used to run the software
