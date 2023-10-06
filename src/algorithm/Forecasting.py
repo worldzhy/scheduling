@@ -42,23 +42,28 @@ class Forecast():
             raise Exception(f'Invalid program id, should only be 0 to {len(self._program_list) - 1}')
         return self._program_list[id]
 
-    def run(self) -> List[ForecastResult]:
+    def _filter_data(self) -> pd.DataFrame:
         # import data
         data = pd.read_csv('data/processed/capacity.csv')
         # filter by studio
         data = data[data['studio'] == int(self._studio_id)]
         if (len(data) == 0):
             raise Exception(f'No data found for studio "{self._studio_id}"')
-        # filter by group
+        # filter by program and location
         data = data[data['group'] == str(f'{self._get_program_by_id(self._program_id)}-{self._location_id}')]
         if (len(data) == 0):
             raise Exception(f'No data found for program "{self._program_id}" in location "{self._location_id}"')
-        # generate forecasts
-        forecasts: List[ForecastResult] = []   
-        # preprocess data
+        # get only required columns
         data = data[['date', 'demand', 'day']]
         data.columns = ['ds', 'y', 'day']
+        # date as datetime
         data['ds'] = pd.to_datetime(data['ds'])
+        # return data
+        return data
+
+    def run(self) -> List[ForecastResult]:
+        # get data
+        data = self._filter_data()
         # call prophet
         m = Prophet()
         m.add_regressor('day')
@@ -67,11 +72,10 @@ class Forecast():
         # generate future dates
         future_dates = self._generate_future_dates()
         forecast = m.predict(future_dates)
-
         # get only needed columns
         forecast = forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
-
         # append to forecasts object
+        forecasts: List[ForecastResult] = [] 
         for _, row in forecast.iterrows():
             forecasts.append({
                 'date': row['ds'],
@@ -82,6 +86,5 @@ class Forecast():
                 'capacity_lower': row['yhat_lower'],
                 'capacity_upper': row['yhat_upper'],
             })
-
-        # Return forecasts
+        # return forecasts
         return forecasts
