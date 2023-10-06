@@ -24,9 +24,9 @@ class Controller():
         schema = ForecastSchema()
         data = cast(Any, schema.load(request.json))
         # get parameters
-        studio = cast(str, data['studio'])
-        program = cast(str, data['program'])
-        location = cast(str, data['location'])
+        studio = cast(int, data['studio_id'])
+        program = cast(int, data['program_id'])
+        location = cast(int, data['location_id'])
         year = cast(int, data['year'])
         month = cast(int, data['month'])
         # run model and return result

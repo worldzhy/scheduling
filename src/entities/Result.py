@@ -13,9 +13,9 @@ class SchedulingResult(TypedDict):
 
 class ForecastResult(TypedDict):
     date: str
-    studio: str
-    location: str
-    program: str
+    studio_id: int
+    location_id: int
+    program_id: int
     capacity: float
     capacity_lower: float
     capacity_upper: float

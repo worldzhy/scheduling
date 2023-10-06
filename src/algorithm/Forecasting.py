@@ -1,4 +1,4 @@
-from typing import List, TypedDict
+from typing import List
 from datetime import datetime, timedelta
 from src.entities.Result import ForecastResult
 from prophet import Prophet
@@ -6,12 +6,13 @@ import pandas as pd
 import calendar
 
 class Forecast():
-    def __init__(self, studio: str, program: str, location: str, year: int, month: int):
-        self._studio = studio
-        self._program = program
-        self._location = location
+    def __init__(self, studio_id: int, program_id: int, location_id: int, year: int, month: int):
+        self._studio_id = studio_id
+        self._program_id = program_id
+        self._location_id = location_id
         self._year = year
         self._month = month
+        self._program_list = ['30minexpress', 'advanced', 'armsabs', 'beginner', 'bunsabs', 'bunsguns', 'training', 'foundations', 'fullbody']
 
     def _get_days_in_month(self) -> int:
         try:
@@ -36,17 +37,22 @@ class Forecast():
         # return list of dates
         return pd.DataFrame({'ds': date_list, 'day': day_list})
 
+    def _get_program_by_id(self, id: int) -> str:
+        if id >= len(self._program_list):
+            raise Exception(f'Invalid program id, should only be 0 to {len(self._program_list) - 1}')
+        return self._program_list[id]
+
     def run(self) -> List[ForecastResult]:
         # import data
         data = pd.read_csv('data/processed/capacity.csv')
         # filter by studio
-        data = data[data['studio'] == int(self._studio)]
+        data = data[data['studio'] == int(self._studio_id)]
         if (len(data) == 0):
-            raise Exception(f'No data found for studio "{self._studio}"')
+            raise Exception(f'No data found for studio "{self._studio_id}"')
         # filter by group
-        data = data[data['group'] == str(f'{self._program}-{self._location}')]
+        data = data[data['group'] == str(f'{self._get_program_by_id(self._program_id)}-{self._location_id}')]
         if (len(data) == 0):
-            raise Exception(f'No data found for program "{self._program}" in location "{self._location}"')
+            raise Exception(f'No data found for program "{self._program_id}" in location "{self._location_id}"')
         # generate forecasts
         forecasts: List[ForecastResult] = []   
         # preprocess data
@@ -69,9 +75,9 @@ class Forecast():
         for _, row in forecast.iterrows():
             forecasts.append({
                 'date': row['ds'],
-                'studio': self._studio,
-                'location': self._location,
-                'program': self._program,
+                'studio_id': self._studio_id,
+                'location_id': self._location_id,
+                'program_id': self._program_id,
                 'capacity': row['yhat'],
                 'capacity_lower': row['yhat_lower'],
                 'capacity_upper': row['yhat_upper'],
