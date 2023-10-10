@@ -75,7 +75,7 @@ for loc in locations:
     for prog in programs:
         # Filter data by location and program
         data_temp = data[data['location'] == loc]
-        data_temp = data[data['program'] == prog]
+        data_temp = data_temp[data_temp['program'] == prog]
 
         # Group by the 'date' column and calculate the average of 'demand'
         data_temp = data_temp.groupby('date').agg({

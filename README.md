@@ -97,3 +97,17 @@ Sample response:
     }
 ]
 ```
+
+Sample CURL:
+
+```
+curl --location '{baseurl}/forecast' \
+--header 'Content-Type: application/json' \
+--data '{
+    "studio": "44717",
+    "location": "4",
+    "program": "fullbody",
+    "month": 1,
+    "year": 2025
+}'
+```
