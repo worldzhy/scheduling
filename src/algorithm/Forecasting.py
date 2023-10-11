@@ -1,5 +1,6 @@
 from typing import List
 from datetime import datetime, timedelta
+from src.data.DataForecast import DataForecast
 from src.entities.Result import ForecastResult
 from prophet import Prophet
 import pandas as pd
@@ -42,9 +43,12 @@ class Forecast():
             raise Exception(f'Invalid program id, should only be 0 to {len(self._program_list) - 1}')
         return self._program_list[id]
 
-    def _filter_data(self) -> pd.DataFrame:
+    def _get_data(self) -> pd.DataFrame:
+        # fetch and preprocess data
+        # TO DO: Cache this
+        DataForecast().preprocess()
         # import data
-        data = pd.read_csv('data/processed/capacity.csv')
+        data = pd.read_csv('data/processed/demand.csv')
         # filter by studio
         data = data[data['studio'] == int(self._studio_id)]
         if (len(data) == 0):
@@ -63,7 +67,7 @@ class Forecast():
 
     def run(self) -> List[ForecastResult]:
         # get data
-        data = self._filter_data()
+        data = self._get_data()
         # call prophet
         m = Prophet()
         m.add_regressor('day')
