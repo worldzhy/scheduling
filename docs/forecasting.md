@@ -2,12 +2,6 @@
 
 Given a historical time series data of the demand per studio, location, and program, the model will try to forecast the future demand given the following: year, month, studio, location, and program.
 
-## Constraints
-
-- Do not schedule a coach that is not available on the specific time and day
-- Do not assign assign a coach that is not qualified to lead a specific program
-- A studio can only cater one program on a specific time and day.
-
 ## Dataset
 
 Raw tables needed from `snowflake` are:

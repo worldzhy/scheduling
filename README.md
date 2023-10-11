@@ -26,6 +26,10 @@
 
 ## Endpoints
 
+### Scheduling
+
+TODO: Add scheduling API documentation
+
 ### Forecast
 
 Gives the forecasted capacity (with lower and upper confidence interval) per day in a month given the following: month, year, studio, location, and program.
