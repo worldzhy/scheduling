@@ -21,15 +21,15 @@ class DataForecast:
             index_col = False
         )
         self._csv_descriptions = pd.read_csv(
-            'data/raw/tblclasses_descriptions.csv', 
-            usecols = ['CLASSDESCRIPTIONID', 'CLASSNAME']
+            'data/raw/tblclassdescriptions.csv', 
+            usecols = ['CLASSID', 'CLASSNAME']
         )
 
     def _preprocess_class_description(self):
         # rename columns
         self._csv_descriptions.rename(
             columns = {
-                'CLASSDESCRIPTIONID': 'classid',
+                'CLASSID': 'classid',
                 'CLASSNAME': 'classname',
             },
             inplace = True
@@ -67,7 +67,7 @@ class DataForecast:
 
     def _preprocess_demand(self):
         # rename the selected columns
-        self._csv_classes(
+        self._csv_classes.rename(
             columns = {
                 'CLASSDATESTART': 'date',
                 'LOCATIONID': 'location',
@@ -117,7 +117,7 @@ class DataForecast:
         for loc in locations:
             for prog in programs:
                 # filter data by location and program
-                data_temp = self._csv_classes[data['location'] == loc]
+                data_temp = self._csv_classes[self._csv_classes['location'] == loc]
                 data_temp = data_temp[data_temp['program'] == prog]
                 # group by the 'date' column and calculate the average of 'demand'
                 data_temp = data_temp.groupby('date').agg({
