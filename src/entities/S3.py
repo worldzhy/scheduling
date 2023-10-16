@@ -19,3 +19,20 @@ class S3:
         response = self._s3.list_objects_v2(Bucket = bucket_name)
         for obj in response.get('Contents', []):
             print(f'Object key: {obj["Key"]}, Size: {obj["Size"]} bytes')
+
+    def copy_file(self, bucket_name: str, current_s3_path: str, new_s3_path: str):
+        self._s3.copy_object(
+            CopySource = { 'Bucket': bucket_name, 'Key': current_s3_path },
+            Bucket = bucket_name,
+            Key= new_s3_path
+        )
+
+    def delete_file(self, bucket_name: str, s3_path: str):
+        self._s3.delete_object(
+            Bucket = bucket_name,
+            Key = s3_path
+        )
+
+    def rename_file(self, bucket_name: str, current_s3_path: str, new_s3_path: str):
+        self.copy_file(bucket_name, current_s3_path, new_s3_path)
+        self.delete_file(bucket_name, current_s3_path)
