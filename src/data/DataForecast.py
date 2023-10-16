@@ -149,9 +149,10 @@ class DataForecast:
             comments = ''
         )
 
-    def preprocess(self):
+    def preprocess(self, force_fetch: bool):
         # download raw data
-        self._download()
+        if force_fetch:
+            self._download()
         # read data
         self._read()
         # preprocess

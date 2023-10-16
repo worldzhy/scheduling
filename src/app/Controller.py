@@ -22,13 +22,19 @@ class Controller():
     def forecast(self, request: Request):
         # validate request
         schema = ForecastSchema()
-        params = cast(Any, schema.load(request.json))
+        body = cast(Any, schema.load(request.json))
         # get parameters
-        studio = cast(int, params['studio_id'])
-        program = cast(int, params['program_id'])
-        location = cast(int, params['location_id'])
-        year = cast(int, params['year'])
-        month = cast(int, params['month'])
-        # run model and return result
+        studio = cast(int, body['params']['studio_id'])
+        program = cast(int, body['params']['program_id'])
+        location = cast(int, body['params']['location_id'])
+        year = cast(int, body['params']['year'])
+        month = cast(int, body['params']['month'])
+        # get configs
+        force_fetch = cast(bool, body['config']['force_fetch']) if body['config'] and body['config']['force_fetch'] else None
+        # configure model
         algo = Forecast(studio, program, location, year, month)
+        algo.configure(
+            force_fetch = force_fetch
+        )
+        # run model and return result
         return algo.run()

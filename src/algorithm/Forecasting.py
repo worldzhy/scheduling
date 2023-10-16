@@ -8,12 +8,15 @@ import calendar
 
 class Forecast():
     def __init__(self, studio_id: int, program_id: int, location_id: int, year: int, month: int):
+        # params
         self._studio_id = studio_id
         self._program_id = program_id
         self._location_id = location_id
         self._year = year
         self._month = month
         self._program_list = ['30minexpress', 'advanced', 'armsabs', 'beginner', 'bunsabs', 'bunsguns', 'training', 'foundations', 'fullbody']
+        # configs
+        self._force_fetch: bool = False
 
     def _get_days_in_month(self) -> int:
         try:
@@ -46,7 +49,7 @@ class Forecast():
     def _get_data(self) -> pd.DataFrame:
         # fetch and preprocess data
         # TO DO: Cache this
-        DataForecast().preprocess()
+        DataForecast().preprocess(self._force_fetch)
         # import data
         data = pd.read_csv('data/processed/demand.csv')
         # filter by studio
@@ -64,6 +67,12 @@ class Forecast():
         data['ds'] = pd.to_datetime(data['ds'])
         # return data
         return data
+    
+    def configure(
+        self,
+        force_fetch: None | bool = None,
+    ) -> None:
+        self._force_fetch = force_fetch if force_fetch is not None else self._force_fetch
 
     def run(self) -> List[ForecastResult]:
         # get data
