@@ -1,6 +1,8 @@
 # type: ignore
 import pandas as pd
 import numpy as np
+from ..entities.S3 import S3
+from ..entities.Helper import Helper
 
 class DataForecast:
     def __init__(self):
@@ -8,15 +10,18 @@ class DataForecast:
         self._csv_descriptions: pd.DataFrame = pd.DataFrame()
         self._program_list = ['30minexpress', 'advanced', 'armsabs', 'beginner', 'bunsabs', 'bunsguns', 'training', 'foundations', 'fullbody']
         self._days_of_the_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+        self._s3 = S3()
+        self._helper = Helper()
 
     def _download(self):
-        print('TODO')
-        # Download from S3 tblclass.csv and saved to data/raw/tblclasses.csv
+        # To do: Make this dynamic
+        self._s3.download_file('imari-bucket', 'raw/tblclasses/2023-08.csv.gz', 'data/raw/gz/tblclasses_2023-08.csv.gz')
+        self._helper.uncompress_gz('data/raw/gz/tblclasses_2023-08.csv.gz', 'data/raw/tblclasses_2023-08.csv')
         # Download from S3 tblclasses_descriptions.csv and saved to data/raw/tblclasses_descriptions.csv
 
     def _read(self):
         self._csv_classes = pd.read_csv(
-            'data/raw/data_0_1_0.csv',
+            'data/raw/tblclasses_2023-08.csv',
             names = ["CLASSSTARTTIME","CLASSENDTIME","CLASSDATESTART","CLASSDATEEND","CLASSUPDATED","CREATIONDATETIME","LASTMODIFIEDON","CREATEDDATETIMEUTC","MODIFIEDDATETIMEUTC","STUDIOID","CLASSID","SUBCLASSID","DESCRIPTIONID","CLASSTRAINERID","LOCATIONID","PAYSCALEID","CLASSCAPACITY","MAXCAPACITY","TRAINERID2","TRAINERID3","WAITLISTSIZE","EMPID","COURSEID","SEMESTERID","ENROLLEDRESERVED","DROPINRESERVED","CREATEDBY","LASTMODIFIEDBY","BATCHKEY","DAYSUNDAY","DAYMONDAY","DAYTUESDAY","DAYWEDNESDAY","DAYTHURSDAY","DAYFRIDAY","DAYSATURDAY","CLASSACTIVE","NOLOC","FREE","PMTPLAN","USELEADFOLLOWSPLIT","MASKTRAINER","ALLOWUNPAIDS","ALLOWOPENENROLLMENT","TRPAYSASST1","TRPAYSASST2","ALLOWDATEFORWARDENROLLMENT","RECURRING","SOFTDELETED","LOADEDDATETIMEUTC"],
             usecols = ['CLASSDATESTART', 'LOCATIONID', 'CLASSID', 'STUDIOID', 'CLASSTRAINERID', 'CLASSCAPACITY', 'WAITLISTSIZE', 'DAYSUNDAY', 'DAYMONDAY', 'DAYTUESDAY', 'DAYWEDNESDAY', 'DAYTHURSDAY', 'DAYFRIDAY', 'DAYSATURDAY'],
             index_col = False
