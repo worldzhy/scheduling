@@ -10,10 +10,18 @@ class S3:
         )
 
     def upload_file(self, file_path: str, bucket_name: str, s3_path: str):
-        self._s3.upload_file(file_path, bucket_name, s3_path)
+        self._s3.upload_file(
+            file_path,
+            bucket_name,
+            s3_path
+        )
 
     def download_file(self, bucket_name: str, s3_path: str, file_path: str):
-        self._s3.download_file(bucket_name, s3_path, file_path)
+        self._s3.download_file(
+            bucket_name,
+            s3_path,
+            file_path
+        )
 
     def list_files(self, bucket_name: str):
         response = self._s3.list_objects_v2(Bucket = bucket_name)
