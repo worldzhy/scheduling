@@ -44,3 +44,8 @@ class S3:
     def rename_file(self, bucket_name: str, current_s3_path: str, new_s3_path: str):
         self.copy_file(bucket_name, current_s3_path, new_s3_path)
         self.delete_file(bucket_name, current_s3_path)
+
+    def list_buckets(self):
+        response = self._s3.list_buckets()
+        for bucket in response['Buckets']:
+            print(bucket['Name'])

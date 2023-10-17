@@ -15,9 +15,15 @@ class DataForecast:
 
     def _download(self):
         # To do: Make this dynamic
-        self._s3.download_file('imari-bucket', 'raw/tblclasses/2023-08.csv.gz', 'data/raw/gz/tblclasses_2023-08.csv.gz')
+        self._s3.download_file('data-lake-196438055748', 'unloaded-from-snowflake/tblclasses/data_0_0_0.csv.gz', 'data/raw/gz/tblclasses_2023-08.csv.gz')
         self._helper.uncompress_gz('data/raw/gz/tblclasses_2023-08.csv.gz', 'data/raw/tblclasses_2023-08.csv')
         # Download from S3 tblclasses_descriptions.csv and saved to data/raw/tblclasses_descriptions.csv
+
+    def _is_processed(self):
+        return (
+            self._helper.is_file_present('data/processed', 'class_description.csv') and
+            self._helper.is_file_present('data/processed', 'demand.csv')
+        )
 
     def _read(self):
         self._csv_classes = pd.read_csv(
@@ -69,7 +75,7 @@ class DataForecast:
         # if classname is not one of the allowed values, change to NaN
         self._csv_descriptions.loc[~self._csv_descriptions['classname'].isin(['30minexpress', 'advanced', 'armsabs', 'beginner', 'bunsabs', 'bunsguns', 'training', 'foundations', 'fullbody']), 'classname'] = np.nan
         # save
-        np.savetxt('data/interim/class_description.csv', self._csv_descriptions, delimiter=',', header='classid,classname', fmt='%s', comments='')
+        np.savetxt('data/processed/class_description.csv', self._csv_descriptions, delimiter=',', header='classid,classname', fmt='%s', comments='')
 
     def _preprocess_demand(self):
         # rename the selected columns
@@ -100,7 +106,7 @@ class DataForecast:
             self._csv_classes.loc[self._csv_classes[day], 'day'] = ind + 1
         self._csv_classes.drop(columns = self._days_of_the_week, inplace = True)
         # add program column
-        self._csv_classes = self._csv_classes.merge(pd.read_csv('data/interim/class_description.csv'), on = 'classid', how = 'left')
+        self._csv_classes = self._csv_classes.merge(pd.read_csv('data/processed/class_description.csv'), on = 'classid', how = 'left')
         self._csv_classes.rename(
             columns = { 'classname': 'program' },
             inplace = True
@@ -150,11 +156,11 @@ class DataForecast:
         )
 
     def preprocess(self, force_fetch: bool):
-        # download raw data
-        if force_fetch:
+        if force_fetch or self._is_processed() == False:
+            # download raw data
             self._download()
-        # read data
-        self._read()
-        # preprocess
-        self._preprocess_class_description()
-        self._preprocess_demand()
+            # read data
+            self._read()
+            # preprocess
+            self._preprocess_class_description()
+            self._preprocess_demand()
