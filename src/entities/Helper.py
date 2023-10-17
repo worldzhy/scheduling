@@ -19,3 +19,6 @@ class Helper:
             return True
         else:
             return False
+        
+    def delete_file(self, file_path: str):
+        os.remove(file_path)

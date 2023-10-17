@@ -23,8 +23,15 @@ class S3:
             file_path
         )
 
-    def list_files(self, bucket_name: str):
-        response = self._s3.list_objects_v2(Bucket = bucket_name)
+    def get_files(self, bucket_name: str, key_prefix: str | None = None):
+        response = self._s3.list_objects_v2(
+            Bucket = bucket_name,
+            Prefix = key_prefix
+        )
+        return response
+
+    def list_files(self, bucket_name: str, key_prefix: str | None = None):
+        response = self.get_files(bucket_name, key_prefix)
         for obj in response.get('Contents', []):
             print(f'Object key: {obj["Key"]}, Size: {obj["Size"]} bytes')
 

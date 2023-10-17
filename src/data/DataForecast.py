@@ -1,4 +1,5 @@
 # type: ignore
+import os
 import pandas as pd
 import numpy as np
 from ..entities.S3 import S3
@@ -14,9 +15,35 @@ class DataForecast:
         self._helper = Helper()
 
     def _download(self):
-        # To do: Make this dynamic
-        self._s3.download_file('data-lake-196438055748', 'unloaded-from-snowflake/tblclasses/data_0_0_0.csv.gz', 'data/raw/gz/tblclasses_2023-08.csv.gz')
-        self._helper.uncompress_gz('data/raw/gz/tblclasses_2023-08.csv.gz', 'data/raw/tblclasses_2023-08.csv')
+        bucket_name = os.getenv('AWS_S3_BUCKET_DATALAKE')
+        #tblclasses
+        response = self._s3.get_files(bucket_name, 'unloaded-from-snowflake/tblclasses')
+        for obj in response.get('Contents', []):
+            local_file_path = 'data/raw/' + obj['Key'].replace('/', '_')
+            self._s3.download_file(bucket_name, obj['Key'], local_file_path)
+            self._helper.uncompress_gz(local_file_path, local_file_path + '.csv')
+            self._helper.delete_file(local_file_path)
+        directory = 'data/raw'
+        output_filename = 'unloaded-from-snowflake_tblclasses.csv'
+        # list all files in the directory
+        files = os.listdir(directory)
+        # filter files with the prefix and end with '.csv'
+        csv_files = [file for file in files if file.startswith('unloaded-from-snowflake_tblclasses') and file.endswith('.csv')]
+        # initialize an empty list to store individual data frames
+        dfs = []
+        # read and merge each CSV file into a data frame
+        for csv_file in csv_files:
+            df = pd.read_csv(os.path.join(directory, csv_file))
+            dfs.append(df)
+        # merge all data frames into one
+        merged_df = pd.concat(dfs, ignore_index = True)
+        # save the merged data frame to a single CSV file
+        merged_df.to_csv(os.path.join(directory, output_filename), index=False)
+        # delete the individual CSV files (except the merged one)
+        for csv_file in csv_files:
+            file_path = os.path.join(directory, csv_file)
+            if csv_file != output_filename:
+                os.remove(file_path)
         # Download from S3 tblclasses_descriptions.csv and saved to data/raw/tblclasses_descriptions.csv
 
     def _is_processed(self):
