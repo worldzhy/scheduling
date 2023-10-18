@@ -2,8 +2,8 @@
 .DS_Store
 # Test output files
 *.out
-# Raw data (files too large)
-data/raw/*
+# Data
+data/*
 # Compiled bytecodes
 **/*.pyc
 # Test file
