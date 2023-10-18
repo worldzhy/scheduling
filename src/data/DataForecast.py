@@ -13,11 +13,13 @@ class DataForecast:
         self._days_of_the_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
         self._s3 = S3()
         self._helper = Helper()
-
+        # data
+        self._s3_tblclasses_prefix = 'unloaded-from-snowflake/tblclasses'
+        self._local_tblclasses_prefix = 'unloaded-from-snowflake_tblclasses'
     def _download(self):
         bucket_name = os.getenv('AWS_S3_BUCKET_DATALAKE')
-        #tblclasses
-        response = self._s3.get_files(bucket_name, 'unloaded-from-snowflake/tblclasses')
+        # tblclasses
+        response = self._s3.get_files(bucket_name, self._s3_tblclasses_prefix)
         for obj in response.get('Contents', []):
             local_file_path = 'data/raw/' + obj['Key'].replace('/', '_')
             self._s3.download_file(bucket_name, obj['Key'], local_file_path)
@@ -25,7 +27,7 @@ class DataForecast:
             self._helper.delete_file(local_file_path)
         self._helper.merge_csv_files(
             folder_path = 'data/raw',
-            file_prefix = 'unloaded-from-snowflake_tblclasses'
+            file_prefix = self._local_tblclasses_prefix
         )
         # Download from S3 tblclasses_descriptions.csv and saved to data/raw/tblclasses_descriptions.csv
 
@@ -37,7 +39,7 @@ class DataForecast:
 
     def _read(self):
         self._csv_classes = pd.read_csv(
-            'data/raw/tblclasses_2023-08.csv',
+            'data/raw/' + self._local_tblclasses_prefix + '.csv',
             names = ["CLASSSTARTTIME","CLASSENDTIME","CLASSDATESTART","CLASSDATEEND","CLASSUPDATED","CREATIONDATETIME","LASTMODIFIEDON","CREATEDDATETIMEUTC","MODIFIEDDATETIMEUTC","STUDIOID","CLASSID","SUBCLASSID","DESCRIPTIONID","CLASSTRAINERID","LOCATIONID","PAYSCALEID","CLASSCAPACITY","MAXCAPACITY","TRAINERID2","TRAINERID3","WAITLISTSIZE","EMPID","COURSEID","SEMESTERID","ENROLLEDRESERVED","DROPINRESERVED","CREATEDBY","LASTMODIFIEDBY","BATCHKEY","DAYSUNDAY","DAYMONDAY","DAYTUESDAY","DAYWEDNESDAY","DAYTHURSDAY","DAYFRIDAY","DAYSATURDAY","CLASSACTIVE","NOLOC","FREE","PMTPLAN","USELEADFOLLOWSPLIT","MASKTRAINER","ALLOWUNPAIDS","ALLOWOPENENROLLMENT","TRPAYSASST1","TRPAYSASST2","ALLOWDATEFORWARDENROLLMENT","RECURRING","SOFTDELETED","LOADEDDATETIMEUTC"],
             usecols = ['CLASSDATESTART', 'LOCATIONID', 'CLASSID', 'STUDIOID', 'CLASSTRAINERID', 'CLASSCAPACITY', 'WAITLISTSIZE', 'DAYSUNDAY', 'DAYMONDAY', 'DAYTUESDAY', 'DAYWEDNESDAY', 'DAYTHURSDAY', 'DAYFRIDAY', 'DAYSATURDAY'],
             index_col = False
@@ -110,6 +112,10 @@ class DataForecast:
         )
         # convert the date column to datetime
         self._csv_classes['date'] = pd.to_datetime(self._csv_classes['date'], errors = 'coerce').dt.date
+        # clean weekdays
+        for col in self._days_of_the_week:
+            self._csv_classes[col] = self._csv_classes[col].apply(lambda x: True if str(x).lower() == 'true' else (False if str(x).lower() == 'false' else None))
+        self._csv_classes = self._csv_classes.dropna(subset = self._days_of_the_week)
         # aggregate days in single column called day
         self._csv_classes['day'] = None
         for ind, day in enumerate(self._days_of_the_week):
@@ -124,6 +130,12 @@ class DataForecast:
         # create demand column
         self._csv_classes['demand'] = self._csv_classes['capacity'] + self._csv_classes['waitlist']
         self._csv_classes.drop(columns=['capacity', 'waitlist'], inplace = True)
+        # location should be an integer
+        self._csv_classes['location'] = self._csv_classes['location'].replace([np.inf, -np.inf], np.nan)
+        self._csv_classes = self._csv_classes.dropna()
+        self._csv_classes['location'] = self._csv_classes['location'].astype(int)
+        # studio should be an integer
+        self._csv_classes['studio'] = self._csv_classes['studio'].astype(int)
         # drop coach for now (not part of the independent variable)
         self._csv_classes.drop(columns = ['coach'], inplace = True)
         # remove rows with NA
