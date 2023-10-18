@@ -24,14 +24,22 @@ class S3:
         )
 
     def get_files(self, bucket_name: str, key_prefix: str | None = None):
-        response = self._s3.list_objects_v2(
-            Bucket = bucket_name,
-            Prefix = key_prefix
-        )
+        if key_prefix is None:
+            response = self._s3.list_objects_v2(
+                Bucket = bucket_name,
+            )
+        else:
+            response = self._s3.list_objects_v2(
+                Bucket = bucket_name,
+                Prefix = key_prefix
+            )
         return response
 
     def list_files(self, bucket_name: str, key_prefix: str | None = None):
-        response = self.get_files(bucket_name, key_prefix)
+        if key_prefix is None:
+            response = self.get_files(bucket_name)
+        else:
+            response = self.get_files(bucket_name, key_prefix)
         for obj in response.get('Contents', []):
             print(f'Object key: {obj["Key"]}, Size: {obj["Size"]} bytes')
 
