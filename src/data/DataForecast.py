@@ -15,7 +15,17 @@ class DataForecast:
         self._helper = Helper()
         # data
         self._s3_tblclasses_prefix = 'unloaded-from-snowflake/tblclasses'
-        self._s3_tblclassdescriptions_prefix = 'unloaded-from-snowflake/tblclassdescriptions'
+        self._s3_tblclassdescriptions_prefix = 'unloaded-from-snowflake/join_tblclasses_tblclassdescriptions'
+    
+    def _clean_raw_files(self):
+        for item in os.listdir('data/raw'):
+            item_path = os.path.join('data/raw', item)
+            if os.path.isfile(item_path):
+                try:
+                    os.remove(item_path)  # delete the file
+                except Exception as e:
+                    print(f"Error deleting {item_path}: {e}")
+
     def _download(self):
         bucket_name = os.getenv('AWS_S3_BUCKET_DATALAKE')
         data_list = [
@@ -184,6 +194,7 @@ class DataForecast:
     def preprocess(self, force_fetch: bool):
         if force_fetch or self._is_processed() == False:
             # download raw data
+            self._clean_raw_files()
             self._download()
             # read data
             self._read()
