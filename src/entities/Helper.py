@@ -4,14 +4,13 @@ import pandas as pd
 
 class Helper:
     def uncompress_gz(self, gz_file_path: str, output_file_path: str):
-        # Open the .gz file for reading
+        # open the .gz file for reading
         with gzip.open(gz_file_path, 'rb') as f_in:
-            # Read the compressed data
+            # read the compressed data
             compressed_data = f_in.read()
-
-        # Open the new file for writing
+        # open the new file for writing
         with open(output_file_path, 'wb') as f_out:
-            # Write the uncompressed data to the new file
+            # write the uncompressed data to the new file
             f_out.write(compressed_data)
 
     def is_file_present(self, folder_path: str, file_name: str):
@@ -23,6 +22,12 @@ class Helper:
         
     def delete_file(self, file_path: str):
         os.remove(file_path)
+
+    def rename_file(self, old_file_path: str, new_file_path: str):
+        try:
+            os.rename(old_file_path, new_file_path)
+        except FileNotFoundError:
+            raise Exception(f'Error: The file "{old_file_path}" does not exist.')
 
     def merge_csv_files(self, folder_path: str, file_prefix: str):
         # prepare filename of merged file

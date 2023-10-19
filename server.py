@@ -23,6 +23,7 @@ def post_forecast():
         return handle_api_error(e)
 
 if __name__ == '__main__':
+    print('API Ready')
     from waitress import serve
     port = 8080
     serve(app, port = port)

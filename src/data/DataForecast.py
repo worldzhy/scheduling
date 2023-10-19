@@ -15,21 +15,25 @@ class DataForecast:
         self._helper = Helper()
         # data
         self._s3_tblclasses_prefix = 'unloaded-from-snowflake/tblclasses'
-        self._local_tblclasses_prefix = 'unloaded-from-snowflake_tblclasses'
+        self._s3_tblclassdescriptions_prefix = 'unloaded-from-snowflake/tblclassdescriptions'
     def _download(self):
         bucket_name = os.getenv('AWS_S3_BUCKET_DATALAKE')
-        # tblclasses
-        response = self._s3.get_files(bucket_name, self._s3_tblclasses_prefix)
-        for obj in response.get('Contents', []):
-            local_file_path = 'data/raw/' + obj['Key'].replace('/', '_')
-            self._s3.download_file(bucket_name, obj['Key'], local_file_path)
-            self._helper.uncompress_gz(local_file_path, local_file_path + '.csv')
-            self._helper.delete_file(local_file_path)
-        self._helper.merge_csv_files(
-            folder_path = 'data/raw',
-            file_prefix = self._local_tblclasses_prefix
-        )
-        # Download from S3 tblclasses_descriptions.csv and saved to data/raw/tblclasses_descriptions.csv
+        data_list = [
+            self._s3_tblclasses_prefix,
+            self._s3_tblclassdescriptions_prefix
+        ]
+        for data in data_list:
+            response = self._s3.get_files(bucket_name, data)
+            for obj in response.get('Contents', []):
+                local_file_path = 'data/raw/' + obj['Key'].replace('/', '_')
+                self._s3.download_file(bucket_name, obj['Key'], local_file_path)
+                if (local_file_path.endswith('gz')):
+                    self._helper.uncompress_gz(local_file_path, local_file_path + '.csv')
+                    self._helper.delete_file(local_file_path)
+            self._helper.merge_csv_files(
+                folder_path = 'data/raw',
+                file_prefix = data.replace('/', '_')
+            )
 
     def _is_processed(self):
         return (
@@ -39,13 +43,13 @@ class DataForecast:
 
     def _read(self):
         self._csv_classes = pd.read_csv(
-            'data/raw/' + self._local_tblclasses_prefix + '.csv',
+            'data/raw/' + self._s3_tblclasses_prefix.replace('/', '_') + '.csv',
             names = ["CLASSSTARTTIME","CLASSENDTIME","CLASSDATESTART","CLASSDATEEND","CLASSUPDATED","CREATIONDATETIME","LASTMODIFIEDON","CREATEDDATETIMEUTC","MODIFIEDDATETIMEUTC","STUDIOID","CLASSID","SUBCLASSID","DESCRIPTIONID","CLASSTRAINERID","LOCATIONID","PAYSCALEID","CLASSCAPACITY","MAXCAPACITY","TRAINERID2","TRAINERID3","WAITLISTSIZE","EMPID","COURSEID","SEMESTERID","ENROLLEDRESERVED","DROPINRESERVED","CREATEDBY","LASTMODIFIEDBY","BATCHKEY","DAYSUNDAY","DAYMONDAY","DAYTUESDAY","DAYWEDNESDAY","DAYTHURSDAY","DAYFRIDAY","DAYSATURDAY","CLASSACTIVE","NOLOC","FREE","PMTPLAN","USELEADFOLLOWSPLIT","MASKTRAINER","ALLOWUNPAIDS","ALLOWOPENENROLLMENT","TRPAYSASST1","TRPAYSASST2","ALLOWDATEFORWARDENROLLMENT","RECURRING","SOFTDELETED","LOADEDDATETIMEUTC"],
             usecols = ['CLASSDATESTART', 'LOCATIONID', 'CLASSID', 'STUDIOID', 'CLASSTRAINERID', 'CLASSCAPACITY', 'WAITLISTSIZE', 'DAYSUNDAY', 'DAYMONDAY', 'DAYTUESDAY', 'DAYWEDNESDAY', 'DAYTHURSDAY', 'DAYFRIDAY', 'DAYSATURDAY'],
             index_col = False
         )
         self._csv_descriptions = pd.read_csv(
-            'data/raw/tblclassdescriptions.csv', 
+            'data/raw/' + self._csv_descriptions.replace('/', '_') + '.csv', 
             usecols = ['CLASSID', 'CLASSNAME']
         )
 
