@@ -59,7 +59,7 @@ class DataForecast:
             index_col = False
         )
         self._csv_descriptions = pd.read_csv(
-            'data/raw/' + self._csv_descriptions.replace('/', '_') + '.csv', 
+            'data/raw/' + self._s3_tblclassdescriptions_prefix.replace('/', '_') + '.csv', 
             usecols = ['CLASSID', 'CLASSNAME']
         )
 
