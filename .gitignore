@@ -8,6 +8,7 @@ data/*
 **/*.pyc
 # Test file
 test.py
+test.ipynb
 # env file
 .env
 # python env
