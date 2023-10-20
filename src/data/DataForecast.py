@@ -72,6 +72,8 @@ class DataForecast:
             },
             inplace = True
         )
+        # drop columns with NA
+        self._csv_descriptions = self._csv_descriptions.dropna()
         # lower case all
         self._csv_descriptions['classname'] = self._csv_descriptions['classname'].str.lower()
         # remove all spaces
