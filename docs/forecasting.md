@@ -77,6 +77,10 @@ The forecasting model makes use of the [Prophet](https://facebook.github.io/prop
 
 3. Based on the target month and year of forecast, using the fitted model, the model will generate forecasted demand for those dates.
 
+## Limitations
+
+- Some combination of `studio_id`, `location_id`, and `program_id` has low number of available data. In this case, forecast result will likely be not accurate. To prevent giving inaccurate result, the forecast API will throw an error indicating that there is no enough data to produce forecast result if data length is less than 1000.
+
 ## Usage
 
 ### Input
