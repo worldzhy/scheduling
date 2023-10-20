@@ -43,7 +43,7 @@ class Forecast():
 
     def _get_program_by_id(self, id: int) -> str:
         if id >= len(self._program_list):
-            raise Exception(f'Invalid program id, should only be 0 to {len(self._program_list) - 1}')
+            raise Exception(f'Invalid program id, should only be 0 to {len(self._program_list) - 1}.')
         return self._program_list[id]
 
     def _get_data(self) -> pd.DataFrame:
@@ -55,11 +55,11 @@ class Forecast():
         # filter by studio
         data = data[data['studio'] == int(self._studio_id)]
         if (len(data) == 0):
-            raise Exception(f'No data found for studio "{self._studio_id}"')
+            raise Exception(f'No data found for studio "{self._studio_id}".')
         # filter by program and location
         data = data[data['group'] == str(f'{self._get_program_by_id(self._program_id)}-{self._location_id}')]
         if (len(data) == 0):
-            raise Exception(f'No data found for program "{self._program_id}" in location "{self._location_id}"')
+            raise Exception(f'No data found for program "{self._program_id}" in location "{self._location_id}".')
         # get only required columns
         data = data[['date', 'demand', 'day']]
         data.columns = ['ds', 'y', 'day']
@@ -77,6 +77,8 @@ class Forecast():
     def run(self) -> List[ForecastResult]:
         # get data
         data = self._get_data()
+        if (len(data) < 1000):
+            raise Exception(f'Not enough data to produce forecast result. Data length is {len(data)}, needs atleast 1000.')
         # call prophet
         m = Prophet()
         m.add_regressor('day')

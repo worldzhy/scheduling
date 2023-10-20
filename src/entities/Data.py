@@ -45,7 +45,7 @@ class Data:
                 if (s.id == id):
                     return copy.deepcopy(s)
             # if no matching id found, raise exception
-            raise Exception(f'Studio {id} not found')
+            raise Exception(f'Studio {id} not found.')
 
     # populates time
     def _parse_time(self):
@@ -70,7 +70,7 @@ class Data:
                 if (t.id == id):
                     return copy.deepcopy(t)
             # if no matching id found, raise exception
-            raise Exception(f'Time {id} not found')
+            raise Exception(f'Time {id} not found.')
 
     # populates day
     def _parse_day(self):
@@ -95,7 +95,7 @@ class Data:
                 if (d.id == id):
                     return copy.deepcopy(d)
             # if no matching id found, raise exception
-            raise Exception(f'Day {id} not found')
+            raise Exception(f'Day {id} not found.')
 
     # populates program
     def _parse_program(self):
@@ -114,7 +114,7 @@ class Data:
                 if (p.id == id):
                     return copy.deepcopy(p)
             # if no matching id found, raise exception
-            raise Exception(f'Program {id} not found')
+            raise Exception(f'Program {id} not found.')
 
     # populates coach
     def _parse_coach(self):
@@ -133,7 +133,7 @@ class Data:
                 if (c.id == id):
                     return copy.deepcopy(c)
             # if no matching id found, raise exception
-            raise Exception(f'Coach {id} not found')
+            raise Exception(f'Coach {id} not found.')
 
     # populates coach qualification
     def _add_coach_qualification(self):
