@@ -44,19 +44,27 @@ Sample payload:
 
 ```
 {
-    "studio_id": 44717,
-    "location_id": 4,
-    "program_id": 8,
-    "month": 4,
-    "year": 2025
+    "params": {
+        "studio_id": 5723430,
+        "location_id": 4,
+        "program_id": 8,
+        "month": 11,
+        "year": 2023
+    },
+    "config": {
+        "force_fetch": false
+    }
 }
 ```
 
-- `studio_id`: the id corresponding to a studio
-- `location_id`: the id corresponding to a location
-- `program_id`: the id corresponding to a program
-- `month`: the number of the month (ex: 1 - January, 2 - February, ..., 12 - December)
-- `year`: target year
+- `params`
+  - `studio_id` (int): the id corresponding to a studio
+  - `location_id` (int): the id corresponding to a location
+  - `program_id` (int): the id corresponding to a program
+  - `month` (int): the number of the month (ex: 1 - January, 2 - February, ..., 12 - December)
+  - `year` (int): target year
+- `config`:
+  - `force_fetch` (bool): if true, redownloads data, else downloads only data if data is not available locally
 
 Sample response:
 
