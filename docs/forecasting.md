@@ -77,9 +77,9 @@ The forecasting model makes use of the [Prophet](https://facebook.github.io/prop
 
 3. Based on the target month and year of forecast, using the fitted model, the model will generate forecasted demand for those dates.
 
-### Usage
+## Usage
 
-#### Input
+### Input
 
 ```
 {
@@ -97,7 +97,7 @@ The forecasting model makes use of the [Prophet](https://facebook.github.io/prop
 - `month`: the number of the month (ex: 1 - January, 2 - February, ..., 12 - December)
 - `year`: target year
 
-#### Output
+### Output
 
 ```
 [

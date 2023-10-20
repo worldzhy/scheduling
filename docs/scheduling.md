@@ -122,9 +122,9 @@ These steps will be repeated and it will only stop if one of these two stopping 
 - The number of iteration exceeds `max_iteration`
 - A genome in the current population has a fitness value equal or greater than the `max_fitness`.
 
-### Usage
+## Usage
 
-#### Input
+### Input
 
 TODO: Change API to accept parameters
 
@@ -134,7 +134,7 @@ TODO: Change API to accept parameters
 - `month`: the number of the month (ex: 1 - January, 2 - February, ..., 12 - December)
 - `year`: target year
 
-#### Output
+### Output
 
 TODO: studio should be location and there should be another field for the actual studio
 
