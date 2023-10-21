@@ -19,3 +19,7 @@ class ForecastResult(TypedDict):
     capacity: float
     capacity_lower: float
     capacity_upper: float
+
+class MappingResult(TypedDict):
+    id: int
+    value: str

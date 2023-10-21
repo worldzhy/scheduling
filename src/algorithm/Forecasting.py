@@ -2,6 +2,7 @@ from typing import List
 from datetime import datetime, timedelta
 from src.data.DataForecast import DataForecast
 from src.entities.Result import ForecastResult
+from src.entities.Constant import Constant
 from prophet import Prophet
 import pandas as pd
 import calendar
@@ -14,7 +15,7 @@ class Forecast():
         self._location_id = location_id
         self._year = year
         self._month = month
-        self._program_list = ['30minexpress', 'advanced', 'armsabs', 'beginner', 'bunsabs', 'bunsguns', 'training', 'foundations', 'fullbody']
+        self._program_list = Constant.PROGRAM_LIST
         # configs
         self._force_fetch: bool = False
 

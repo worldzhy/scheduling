@@ -1,13 +1,18 @@
 import os
-from typing import Any, cast
+from typing import Any, List, cast
 from flask import Request
+import pandas as pd
 from .Validator import ForecastSchema
 from ..entities.Data import Data
+from ..entities.Constant import Constant
+from ..entities.Result import MappingResult
+from ..entities.S3 import S3
+from ..entities.Helper import Helper
 from ..algorithm.GeneticAlgorithm import GeneticAlgorithm
 from ..algorithm.Forecasting import Forecast
 
 class Controller():
-    def schedule(self):
+    def post_schedule(self):
         # get data
         data = Data()
         # run model and return result
@@ -19,7 +24,7 @@ class Controller():
         )
         return algo.run()
 
-    def forecast(self, request: Request):
+    def post_forecast(self, request: Request):
         # validate request
         schema = ForecastSchema()
         body = cast(Any, schema.load(request.json))
@@ -38,3 +43,106 @@ class Controller():
         )
         # run model and return result
         return algo.run()
+
+    def get_studio(self):
+        # TO DO: Make this a helper function 
+        # download file
+        s3 = S3()
+        helper = Helper()
+        bucket_name = os.getenv('AWS_S3_BUCKET_DATALAKE')
+        s3_studio_prefix = 'unloaded-from-snowflake/studios'
+        try:
+            helper.delete_file('data/raw/' + s3_studio_prefix.replace('/', '_') + '.csv')
+        except:
+            # Ignore
+            pass
+        response = s3.get_files(bucket_name, s3_studio_prefix)
+        for obj in response.get('Contents', []):
+            local_file_path = 'data/raw/' + obj['Key'].replace('/', '_')
+            s3.download_file(bucket_name, obj['Key'], local_file_path)
+            if (local_file_path.endswith('gz')):
+                helper.uncompress_gz(local_file_path, local_file_path + '.csv')
+                helper.delete_file(local_file_path)
+        helper.merge_csv_files(
+            folder_path = 'data/raw',
+            file_prefix = s3_studio_prefix.replace('/', '_')
+        )
+        # read file
+        data = pd.read_csv(
+            'data/raw/' + s3_studio_prefix.replace('/', '_') + '.csv',
+            usecols = ['STUDIOID','STUDIONAME'],
+            index_col = False
+        )
+        data = data[data['STUDIOID'] > 0]
+        # populate mapping
+        mapping: List[MappingResult] = []
+        for _, row in data.iterrows():
+            mapping.append({
+                'id': row['STUDIOID'],
+                'value': row['STUDIONAME']
+            })
+        return sorted(mapping, key=lambda x: x["id"])
+
+    def get_location(self, request: Request):
+        # validation
+        studio_id = request.args.get('studio_id')
+        if studio_id is None:
+            raise Exception('Value of studio_id missing in the query parameter.')
+        # TO DO: Make this a helper function 
+        # download file
+        s3 = S3()
+        helper = Helper()
+        bucket_name = os.getenv('AWS_S3_BUCKET_DATALAKE')
+        s3_location_prefix = 'unloaded-from-snowflake/location'
+        try:
+            helper.delete_file('data/raw/' + s3_location_prefix.replace('/', '_') + '.csv')
+        except:
+            # Ignore
+            pass
+        response = s3.get_files(bucket_name, s3_location_prefix)
+        for obj in response.get('Contents', []):
+            local_file_path = 'data/raw/' + obj['Key'].replace('/', '_')
+            s3.download_file(bucket_name, obj['Key'], local_file_path)
+            if (local_file_path.endswith('gz')):
+                helper.uncompress_gz(local_file_path, local_file_path + '.csv')
+                helper.delete_file(local_file_path)
+        helper.merge_csv_files(
+            folder_path = 'data/raw',
+            file_prefix = s3_location_prefix.replace('/', '_')
+        )
+        # read file
+        data = pd.read_csv(
+            'data/raw/' + s3_location_prefix.replace('/', '_') + '.csv',
+            usecols = ['STUDIOID', 'LOCATIONID', 'LOCATIONNAME'],
+            index_col = False
+        )
+        data = data[data['STUDIOID'] > 0]
+        data = data[data['STUDIOID'] == int(studio_id)]
+        if (len(data) == 0):
+            raise Exception(f'No data found for studio_id {studio_id}.')
+        # populate mapping
+        mapping: List[MappingResult] = []
+        for _, row in data.iterrows():
+            mapping.append({
+                'id': row['LOCATIONID'],
+                'value': row['LOCATIONNAME']
+            })
+        return sorted(mapping, key=lambda x: x["id"])
+
+    def get_program(self):
+        mapping: List[MappingResult] = []
+        for ind, program in enumerate(Constant.PROGRAM_LIST):
+            mapping.append({
+                'id': ind,
+                'value': program
+            })
+        return sorted(mapping, key=lambda x: x["id"])
+    
+    def get_month(self):
+        mapping: List[MappingResult] = []
+        for ind, program in enumerate(Constant.MONTH_LIST):
+            mapping.append({
+                'id': ind + 1,
+                'value': program
+            })
+        return sorted(mapping, key=lambda x: x["id"])

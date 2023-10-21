@@ -40,7 +40,7 @@ class Helper:
         dfs = []
         # read and merge each CSV file into a data frame
         for csv_file in csv_files:
-            df = pd.read_csv(os.path.join(folder_path, csv_file))
+            df = pd.read_csv(os.path.join(folder_path, csv_file), on_bad_lines='skip')
             dfs.append(df)
         # merge all data frames into one
         merged_df = pd.concat(dfs, ignore_index = True)

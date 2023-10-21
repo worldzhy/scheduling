@@ -4,12 +4,13 @@ import pandas as pd
 import numpy as np
 from ..entities.S3 import S3
 from ..entities.Helper import Helper
+from ..entities.Constant import Constant
 
 class DataForecast:
     def __init__(self):
         self._csv_classes: pd.DataFrame = pd.DataFrame()
         self._csv_descriptions: pd.DataFrame = pd.DataFrame()
-        self._program_list = ['30minexpress', 'advanced', 'armsabs', 'beginner', 'bunsabs', 'bunsguns', 'training', 'foundations', 'fullbody']
+        self._program_list = Constant.PROGRAM_LIST
         self._days_of_the_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
         self._s3 = S3()
         self._helper = Helper()
@@ -101,7 +102,7 @@ class DataForecast:
         # if classname has substring of 'training', replace as 'training' only
         self._csv_descriptions.loc[self._csv_descriptions['classname'].str.contains('training', case = False), 'classname'] = 'training'
         # if classname is not one of the allowed values, change to NaN
-        self._csv_descriptions.loc[~self._csv_descriptions['classname'].isin(['30minexpress', 'advanced', 'armsabs', 'beginner', 'bunsabs', 'bunsguns', 'training', 'foundations', 'fullbody']), 'classname'] = np.nan
+        self._csv_descriptions.loc[~self._csv_descriptions['classname'].isin(self._program_list), 'classname'] = np.nan
         # save
         np.savetxt('data/processed/class_description.csv', self._csv_descriptions, delimiter=',', header='classid,classname', fmt='%s', comments='')
 

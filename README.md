@@ -123,3 +123,176 @@ curl --location '{baseurl}/forecast' \
     "year": 2025
 }'
 ```
+
+### Studio mapping
+
+Gives the mapping of studio id to its string value.
+
+Endpoint:
+
+```
+GET {baseurl}/studio
+```
+
+Sample payload: No payload
+
+Sample response:
+
+```
+[
+    {
+        "id": 44717,
+        "value": "[solidcore] DC.MD.VA"
+    },
+    {
+        "id": 186771,
+        "value": "[solidcore] Minnesota"
+    },
+    ...
+    {
+        "id": 5730646,
+        "value": "[solidcore] Tennessee"
+    },
+    {
+        "id": 5730673,
+        "value": "[solidcore] Tennessee"
+    }
+]
+```
+
+Sample CURL:
+
+```
+curl --location --request GET '{baseurl}/studio' \
+--header 'Content-Type: application/json'
+```
+
+### Location mapping
+
+Gives the mapping of location id to its string value.
+
+Endpoint:
+
+```
+GET {baseurl}/location
+```
+
+Sample payload:
+
+- `studio_id` (int): query parameter indicating the target studio of the locations to be retrieved
+
+Sample response:
+
+```
+[
+    {
+        "id": 1,
+        "value": "DC, Adams Morgan"
+    },
+    {
+        "id": 2,
+        "value": "DC, Shaw"
+    },
+    ...
+    {
+        "id": 40,
+        "value": "New Location"
+    },
+    {
+        "id": 98,
+        "value": "Online Store"
+    }
+]
+```
+
+Sample CURL:
+
+```
+curl --location '{baseurl}/location?studio_id=44717'
+```
+
+### Program mapping
+
+Gives the mapping of program id to its string value.
+
+Endpoint:
+
+```
+GET {baseurl}/program
+```
+
+Sample payload: No payload
+
+Sample response:
+
+```
+[
+    {
+        "id": 0,
+        "value": "30minexpress"
+    },
+    {
+        "id": 1,
+        "value": "advanced"
+    },
+    ...
+    {
+        "id": 7,
+        "value": "foundations"
+    },
+    {
+        "id": 8,
+        "value": "fullbody"
+    }
+]
+```
+
+Sample CURL:
+
+```
+curl --location --request GET '{baseurl}/program' \
+--header 'Content-Type: application/json'
+```
+
+### Month mapping
+
+Gives the mapping of month id to its string value.
+
+Endpoint:
+
+```
+GET {baseurl}/month
+```
+
+Sample payload: No payload
+
+Sample response:
+
+```
+[
+    {
+        "id": 1,
+        "value": "January"
+    },
+    {
+        "id": 2,
+        "value": "February"
+    },
+    ...
+    {
+        "id": 11,
+        "value": "November"
+    },
+    {
+        "id": 12,
+        "value": "December"
+    }
+]
+```
+
+Sample CURL:
+
+```
+curl --location --request GET '{baseurl}/month' \
+--header 'Content-Type: application/json'
+```

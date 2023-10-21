@@ -19,3 +19,7 @@ class Constant:
     MAX_DAY_PROGRAM_COUNT = math.floor(DAY_MINUTES / MIN_PROGRAM_DURATION)
     # fitness adjustment constant
     FITNESS_ADJ = (MAX_PROGRAM_DURATION // RESOLUTION_IN_MINUTES) * MAX_MONTH_PROGRAM_COUNT
+    # program list
+    PROGRAM_LIST = ['30minexpress', 'advanced', 'armsabs', 'beginner', 'bunsabs', 'bunsguns', 'training', 'foundations', 'fullbody']
+    # month list
+    MONTH_LIST = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']

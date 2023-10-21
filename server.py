@@ -11,14 +11,42 @@ controller = Controller()
 @app.route('/schedule', methods=['POST'])
 def post_schedule():
     try:
-        return jsonify(controller.schedule()), 200
+        return jsonify(controller.post_schedule()), 200
     except Exception as e:
         return handle_api_error(e)
 
 @app.route('/forecast', methods=['POST'])
 def post_forecast():
     try:
-        return jsonify(controller.forecast(request)), 200
+        return jsonify(controller.post_forecast(request)), 200
+    except Exception as e:
+        return handle_api_error(e)
+
+@app.route('/studio', methods=['GET'])
+def get_studio():
+    try:
+        return jsonify(controller.get_studio()), 200
+    except Exception as e:
+        return handle_api_error(e)
+    
+@app.route('/location', methods=['GET'])
+def get_location():
+    try:
+        return jsonify(controller.get_location(request)), 200
+    except Exception as e:
+        return handle_api_error(e)
+
+@app.route('/program', methods=['GET'])
+def get_program():
+    try:
+        return jsonify(controller.get_program()), 200
+    except Exception as e:
+        return handle_api_error(e)
+    
+@app.route('/month', methods=['GET'])
+def get_month():
+    try:
+        return jsonify(controller.get_month()), 200
     except Exception as e:
         return handle_api_error(e)
 
