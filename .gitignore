@@ -3,7 +3,8 @@
 # Test output files
 *.out
 # Data
-data/*
+data/*/*.csv
+data/*/*.gz
 # Compiled bytecodes
 **/*.pyc
 # Test file
