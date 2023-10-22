@@ -15,7 +15,7 @@ COPY . .
 
 # Install any needed packages specified in requirements.txt
 RUN python -m pip cache purge
-RUN pip3 install -r requirements.txt --timeout 2000
+RUN pip3 install -r requirements.txt --timeout 2000 --no-cache-dir
 
 # CMD instruction should be used to run the software
 EXPOSE 8080
