@@ -2,11 +2,13 @@
 
 ## Steps to run
 
+1. Populate `.env` based on `.env.example`.
+
 1. Start app in docker
 
    ```bash
-   chmod +x start.sh
-   ./start.sh
+   chmod +x scripts/start.sh
+   scripts/start.sh
    ```
 
 ## Project Structure
