@@ -49,16 +49,15 @@ class Controller():
 
     def get_studio(self):
         # download file
-        s3_studio_prefix = 'unloaded-from-snowflake/studios'
         try:
-            self._helper.delete_file('data/raw/' + s3_studio_prefix.replace('/', '_') + '.csv')
+            self._helper.delete_file('data/raw/' + Config.DATALAKE_STUDIO.replace('/', '_') + '.csv')
         except:
             # Ignore
             pass
-        self._helper.download_files_as_one(Config.AWS_S3_BUCKET_DATALAKE, s3_studio_prefix)
+        self._helper.download_files_as_one(Config.AWS_S3_BUCKET_DATALAKE, Config.DATALAKE_STUDIO)
         # read file
         data = pd.read_csv(
-            'data/raw/' + s3_studio_prefix.replace('/', '_') + '.csv',
+            'data/raw/' + Config.DATALAKE_STUDIO.replace('/', '_') + '.csv',
             usecols = ['STUDIOID','STUDIONAME'],
             index_col = False
         )
@@ -79,16 +78,15 @@ class Controller():
             raise Exception('Value of studio_id missing in the query parameter.')
         # download file
         helper = Helper()
-        s3_location_prefix = 'unloaded-from-snowflake/location'
         try:
-            helper.delete_file('data/raw/' + s3_location_prefix.replace('/', '_') + '.csv')
+            helper.delete_file('data/raw/' + Config.DATALAKE_LOCATION.replace('/', '_') + '.csv')
         except:
             # Ignore
             pass
-        helper.download_files_as_one(Config.AWS_S3_BUCKET_DATALAKE, s3_location_prefix)
+        helper.download_files_as_one(Config.AWS_S3_BUCKET_DATALAKE, Config.DATALAKE_LOCATION)
         # read file
         data = pd.read_csv(
-            'data/raw/' + s3_location_prefix.replace('/', '_') + '.csv',
+            'data/raw/' + Config.DATALAKE_LOCATION.replace('/', '_') + '.csv',
             usecols = ['STUDIOID', 'LOCATIONID', 'LOCATIONNAME'],
             index_col = False
         )

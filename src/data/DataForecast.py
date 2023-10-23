@@ -16,8 +16,8 @@ class DataForecast:
         self._s3 = S3()
         self._helper = Helper()
         # data
-        self._s3_tblclasses_prefix = 'unloaded-from-snowflake/tblclasses'
-        self._s3_tblclassdescriptions_prefix = 'unloaded-from-snowflake/join_tblclasses_tblclassdescriptions'
+        self._s3_tblclasses_prefix = Config.DATALAKE_TBLCLASSES
+        self._s3_tblclassdescriptions_prefix = Config.DATALAKE_TBLCLASSDESCRIPTIONS
     
     def _clean_raw_files(self):
         for item in os.listdir('data/raw'):
