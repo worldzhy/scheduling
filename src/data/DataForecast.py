@@ -2,6 +2,7 @@
 import os
 import pandas as pd
 import numpy as np
+from ..entities.Config import Config
 from ..entities.S3 import S3
 from ..entities.Helper import Helper
 from ..entities.Constant import Constant
@@ -28,13 +29,12 @@ class DataForecast:
                     print(f"Error deleting {item_path}: {e}")
 
     def _download(self):
-        bucket_name = os.getenv('AWS_S3_BUCKET_DATALAKE')
         data_list = [
             self._s3_tblclasses_prefix,
             self._s3_tblclassdescriptions_prefix
         ]
         for data_prefix in data_list:
-            self._helper.download_files_as_one(bucket_name, data_prefix)
+            self._helper.download_files_as_one(Config.AWS_S3_BUCKET_DATALAKE, data_prefix)
 
     def _is_processed(self):
         return (

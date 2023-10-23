@@ -3,10 +3,10 @@ from typing import Any, List, cast
 from flask import Request
 import pandas as pd
 from .Validator import ForecastSchema
+from ..entities.Config import Config
 from ..entities.Data import Data
 from ..entities.Constant import Constant
 from ..entities.Result import MappingResult
-from ..entities.S3 import S3
 from ..entities.Helper import Helper
 from ..algorithm.GeneticAlgorithm import GeneticAlgorithm
 from ..algorithm.Forecasting import Forecast
@@ -20,7 +20,7 @@ class Controller():
         algo.configure(
             num_crossover_points=3,
             max_iteration=10,
-            debug=(os.getenv('APP_DEBUG') == 'True')
+            debug=(Config.APP_DEBUG == 'True')
         )
         return algo.run()
 
@@ -47,14 +47,13 @@ class Controller():
     def get_studio(self):
         # download file
         helper = Helper()
-        bucket_name = os.getenv('AWS_S3_BUCKET_DATALAKE')
         s3_studio_prefix = 'unloaded-from-snowflake/studios'
         try:
             helper.delete_file('data/raw/' + s3_studio_prefix.replace('/', '_') + '.csv')
         except:
             # Ignore
             pass
-        helper.download_files_as_one(bucket_name, s3_studio_prefix)
+        helper.download_files_as_one(Config.AWS_S3_BUCKET_DATALAKE, s3_studio_prefix)
         # read file
         data = pd.read_csv(
             'data/raw/' + s3_studio_prefix.replace('/', '_') + '.csv',
@@ -78,14 +77,13 @@ class Controller():
             raise Exception('Value of studio_id missing in the query parameter.')
         # download file
         helper = Helper()
-        bucket_name = os.getenv('AWS_S3_BUCKET_DATALAKE')
         s3_location_prefix = 'unloaded-from-snowflake/location'
         try:
             helper.delete_file('data/raw/' + s3_location_prefix.replace('/', '_') + '.csv')
         except:
             # Ignore
             pass
-        helper.download_files_as_one(bucket_name, s3_location_prefix)
+        helper.download_files_as_one(Config.AWS_S3_BUCKET_DATALAKE, s3_location_prefix)
         # read file
         data = pd.read_csv(
             'data/raw/' + s3_location_prefix.replace('/', '_') + '.csv',

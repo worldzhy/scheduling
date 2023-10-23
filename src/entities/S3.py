@@ -1,12 +1,13 @@
 import os
 import boto3
+from .Config import Config
 
 class S3:
     def __init__(self):
         self._s3 = boto3.client('s3',
-            aws_access_key_id = os.getenv('AWS_S3_ACCESS_KEY_ID'),
-            aws_secret_access_key = os.getenv('AWS_S3_SECRET_ACCESS_KEY'),
-            region_name = os.getenv('AWS_S3_REGION')
+            aws_access_key_id = Config.AWS_S3_ACCESS_KEY_ID,
+            aws_secret_access_key = Config.AWS_S3_SECRET_ACCESS_KEY,
+            region_name = Config.AWS_S3_REGION
         )
 
     def upload_file(self, file_path: str, bucket_name: str, s3_path: str):
