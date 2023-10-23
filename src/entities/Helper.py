@@ -1,8 +1,12 @@
 import gzip
 import os
 import pandas as pd
+from .S3 import S3
 
 class Helper:
+    def __init__(self):
+        self._s3 = S3()
+
     def uncompress_gz(self, gz_file_path: str, output_file_path: str):
         # open the .gz file for reading
         with gzip.open(gz_file_path, 'rb') as f_in:
@@ -51,3 +55,16 @@ class Helper:
             file_path = os.path.join(folder_path, csv_file)
             if csv_file != merged_filename:
                 os.remove(file_path)
+
+    def download_files_as_one(self, bucket_name: str, s3_prefix: str):
+        response = self._s3.get_files(bucket_name, s3_prefix)
+        for obj in response.get('Contents', []):
+            local_file_path = 'data/raw/' + obj['Key'].replace('/', '_')
+            self._s3.download_file(bucket_name, obj['Key'], local_file_path)
+            if (local_file_path.endswith('gz')):
+                self.uncompress_gz(local_file_path, local_file_path + '.csv')
+                self.delete_file(local_file_path)
+        self.merge_csv_files(
+            folder_path = 'data/raw',
+            file_prefix = s3_prefix.replace('/', '_')
+        )

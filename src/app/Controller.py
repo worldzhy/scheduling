@@ -45,9 +45,7 @@ class Controller():
         return algo.run()
 
     def get_studio(self):
-        # TO DO: Make this a helper function 
         # download file
-        s3 = S3()
         helper = Helper()
         bucket_name = os.getenv('AWS_S3_BUCKET_DATALAKE')
         s3_studio_prefix = 'unloaded-from-snowflake/studios'
@@ -56,17 +54,7 @@ class Controller():
         except:
             # Ignore
             pass
-        response = s3.get_files(bucket_name, s3_studio_prefix)
-        for obj in response.get('Contents', []):
-            local_file_path = 'data/raw/' + obj['Key'].replace('/', '_')
-            s3.download_file(bucket_name, obj['Key'], local_file_path)
-            if (local_file_path.endswith('gz')):
-                helper.uncompress_gz(local_file_path, local_file_path + '.csv')
-                helper.delete_file(local_file_path)
-        helper.merge_csv_files(
-            folder_path = 'data/raw',
-            file_prefix = s3_studio_prefix.replace('/', '_')
-        )
+        helper.download_files_as_one(bucket_name, s3_studio_prefix)
         # read file
         data = pd.read_csv(
             'data/raw/' + s3_studio_prefix.replace('/', '_') + '.csv',
@@ -88,9 +76,7 @@ class Controller():
         studio_id = request.args.get('studio_id')
         if studio_id is None:
             raise Exception('Value of studio_id missing in the query parameter.')
-        # TO DO: Make this a helper function 
         # download file
-        s3 = S3()
         helper = Helper()
         bucket_name = os.getenv('AWS_S3_BUCKET_DATALAKE')
         s3_location_prefix = 'unloaded-from-snowflake/location'
@@ -99,17 +85,7 @@ class Controller():
         except:
             # Ignore
             pass
-        response = s3.get_files(bucket_name, s3_location_prefix)
-        for obj in response.get('Contents', []):
-            local_file_path = 'data/raw/' + obj['Key'].replace('/', '_')
-            s3.download_file(bucket_name, obj['Key'], local_file_path)
-            if (local_file_path.endswith('gz')):
-                helper.uncompress_gz(local_file_path, local_file_path + '.csv')
-                helper.delete_file(local_file_path)
-        helper.merge_csv_files(
-            folder_path = 'data/raw',
-            file_prefix = s3_location_prefix.replace('/', '_')
-        )
+        helper.download_files_as_one(bucket_name, s3_location_prefix)
         # read file
         data = pd.read_csv(
             'data/raw/' + s3_location_prefix.replace('/', '_') + '.csv',

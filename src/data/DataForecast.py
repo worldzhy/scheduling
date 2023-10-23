@@ -33,18 +33,8 @@ class DataForecast:
             self._s3_tblclasses_prefix,
             self._s3_tblclassdescriptions_prefix
         ]
-        for data in data_list:
-            response = self._s3.get_files(bucket_name, data)
-            for obj in response.get('Contents', []):
-                local_file_path = 'data/raw/' + obj['Key'].replace('/', '_')
-                self._s3.download_file(bucket_name, obj['Key'], local_file_path)
-                if (local_file_path.endswith('gz')):
-                    self._helper.uncompress_gz(local_file_path, local_file_path + '.csv')
-                    self._helper.delete_file(local_file_path)
-            self._helper.merge_csv_files(
-                folder_path = 'data/raw',
-                file_prefix = data.replace('/', '_')
-            )
+        for data_prefix in data_list:
+            self._helper.download_files_as_one(bucket_name, data_prefix)
 
     def _is_processed(self):
         return (
