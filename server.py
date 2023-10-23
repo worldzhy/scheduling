@@ -1,9 +1,10 @@
 from dotenv import load_dotenv
+load_dotenv()
+
 from src.app.Helper import handle_api_error
 from src.app.Controller import Controller
 from flask import Flask, jsonify, request
 
-load_dotenv()
 app = Flask(__name__)
 controller = Controller()
 

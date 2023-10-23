@@ -1,7 +1,6 @@
-import os
+import pandas as pd
 from typing import Any, List, cast
 from flask import Request
-import pandas as pd
 from .Validator import ForecastSchema
 from ..entities.Config import Config
 from ..entities.Data import Data
@@ -12,6 +11,10 @@ from ..algorithm.GeneticAlgorithm import GeneticAlgorithm
 from ..algorithm.Forecasting import Forecast
 
 class Controller():
+    def __init__(self):
+        # params
+        self._helper = Helper()
+
     def post_schedule(self):
         # get data
         data = Data()
@@ -46,14 +49,13 @@ class Controller():
 
     def get_studio(self):
         # download file
-        helper = Helper()
         s3_studio_prefix = 'unloaded-from-snowflake/studios'
         try:
-            helper.delete_file('data/raw/' + s3_studio_prefix.replace('/', '_') + '.csv')
+            self._helper.delete_file('data/raw/' + s3_studio_prefix.replace('/', '_') + '.csv')
         except:
             # Ignore
             pass
-        helper.download_files_as_one(Config.AWS_S3_BUCKET_DATALAKE, s3_studio_prefix)
+        self._helper.download_files_as_one(Config.AWS_S3_BUCKET_DATALAKE, s3_studio_prefix)
         # read file
         data = pd.read_csv(
             'data/raw/' + s3_studio_prefix.replace('/', '_') + '.csv',

@@ -11,8 +11,8 @@ class Forecast():
     def __init__(self, studio_id: int, program_id: int, location_id: int, year: int, month: int):
         # params
         self._studio_id = studio_id
-        self._program_id = program_id
         self._location_id = location_id
+        self._program_id = program_id
         self._year = year
         self._month = month
         self._program_list = Constant.PROGRAM_LIST
@@ -49,7 +49,6 @@ class Forecast():
 
     def _get_data(self) -> pd.DataFrame:
         # fetch and preprocess data
-        # TO DO: Cache this
         DataForecast().preprocess(self._force_fetch)
         # import data
         data = pd.read_csv('data/processed/demand.csv')
