@@ -9,6 +9,7 @@ from ..entities.Result import MappingResult
 from ..entities.Helper import Helper
 from ..algorithm.GeneticAlgorithm import GeneticAlgorithm
 from ..algorithm.Forecasting import Forecast
+from ..data.DataStudio import DataStudio
 
 class Controller():
     def __init__(self):
@@ -48,26 +49,15 @@ class Controller():
         return algo.run()
 
     def get_studio(self):
-        # download file
-        try:
-            self._helper.delete_file('data/raw/' + Config.DATALAKE_STUDIO.replace('/', '_') + '.csv')
-        except:
-            # Ignore
-            pass
-        self._helper.download_files_as_one(Config.AWS_S3_BUCKET_DATALAKE, Config.DATALAKE_STUDIO)
-        # read file
-        data = pd.read_csv(
-            'data/raw/' + Config.DATALAKE_STUDIO.replace('/', '_') + '.csv',
-            usecols = ['STUDIOID','STUDIONAME'],
-            index_col = False
-        )
-        data = data[data['STUDIOID'] > 0]
+        DataStudio().preprocess(True)
+        # import data
+        data = pd.read_csv('data/processed/studio.csv')
         # populate mapping
         mapping: List[MappingResult] = []
         for _, row in data.iterrows():
             mapping.append({
-                'id': row['STUDIOID'],
-                'value': row['STUDIONAME']
+                'id': row['id'],
+                'value': row['name']
             })
         return sorted(mapping, key=lambda x: x["id"])
 
