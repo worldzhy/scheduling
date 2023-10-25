@@ -1,5 +1,6 @@
 # type: ignore
 import os
+import csv
 import pandas as pd
 import numpy as np
 from ..entities.Config import Config
@@ -94,7 +95,7 @@ class DataForecast:
         # if classname is not one of the allowed values, change to NaN
         self._csv_descriptions.loc[~self._csv_descriptions['classname'].isin(self._program_list), 'classname'] = np.nan
         # save
-        np.savetxt('data/processed/class_description.csv', self._csv_descriptions, delimiter=',', header='classid,classname', fmt='%s', comments='')
+        self._csv_descriptions.to_csv('data/processed/class_description.csv', index=False, quoting=csv.QUOTE_NONNUMERIC)
 
     def _preprocess_demand(self):
         # rename the selected columns
@@ -175,14 +176,7 @@ class DataForecast:
                 # concatenate current data group to main processed data
                 data_processed = pd.concat([data_processed, data_temp], ignore_index = True)
         # save processed data
-        np.savetxt(
-            'data/processed/demand.csv',
-            data_processed,
-            delimiter = ',',
-            header = 'date,studio,location,program,day,demand,group',
-            fmt = '%s',
-            comments = ''
-        )
+        data_processed.to_csv('data/processed/demand.csv', index=False, quoting=csv.QUOTE_NONNUMERIC)
 
     def preprocess(self, force_fetch: bool):
         if force_fetch or self._is_processed() == False:

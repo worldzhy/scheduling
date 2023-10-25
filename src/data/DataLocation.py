@@ -1,19 +1,20 @@
 # type: ignore
 import pandas as pd
+import numpy as np
 import csv
 from ..entities.Config import Config
 from ..entities.S3 import S3
 from ..entities.Helper import Helper
 from ..entities.Constant import Constant
 
-class DataStudio:
+class DataLocation:
     def __init__(self):
         self._csv: pd.DataFrame = pd.DataFrame()
         self._s3 = S3()
         self._helper = Helper()
         # data
         self._bucket = Config.AWS_S3_BUCKET_DATALAKE
-        self._file_prefix = Config.DATALAKE_STUDIO
+        self._file_prefix = Config.DATALAKE_LOCATION
     
     def _clean_raw_files(self):
         try:
@@ -26,12 +27,12 @@ class DataStudio:
         self._helper.download_files_as_one(self._bucket, self._file_prefix)
 
     def _is_processed(self):
-        return self._helper.is_file_present('data/processed', 'studio.csv')
+        return self._helper.is_file_present('data/processed', 'location.csv')
 
     def _read(self):
         self._csv = pd.read_csv(
             'data/raw/' + self._file_prefix.replace('/', '_') + '.csv',
-            usecols = ['STUDIOID', 'STUDIONAME'],
+            usecols = ['STUDIOID', 'LOCATIONID', 'LOCATIONNAME'],
             index_col = False
         )
 
@@ -39,8 +40,9 @@ class DataStudio:
         # rename columns
         self._csv.rename(
             columns = {
-                'STUDIOID': 'id',
-                'STUDIONAME': 'name',
+                'STUDIOID': 'studio_id',
+                'LOCATIONID': 'id',
+                'LOCATIONNAME': 'name',
             },
             inplace = True
         )
@@ -48,7 +50,7 @@ class DataStudio:
         self._csv = self._csv.dropna()
         self._csv = self._csv[self._csv['id'] > 0]
         # save
-        self._csv.to_csv('data/processed/studio.csv', index=False, quoting=csv.QUOTE_NONNUMERIC)
+        self._csv.to_csv('data/processed/location.csv', index=False, quoting=csv.QUOTE_NONNUMERIC)
 
     def preprocess(self, force_fetch: bool):
         if force_fetch or self._is_processed() == False:

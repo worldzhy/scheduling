@@ -10,6 +10,7 @@ from ..entities.Helper import Helper
 from ..algorithm.GeneticAlgorithm import GeneticAlgorithm
 from ..algorithm.Forecasting import Forecast
 from ..data.DataStudio import DataStudio
+from ..data.DataLocation import DataLocation
 
 class Controller():
     def __init__(self):
@@ -49,8 +50,8 @@ class Controller():
         return algo.run()
 
     def get_studio(self):
+        # download and read data
         DataStudio().preprocess(True)
-        # import data
         data = pd.read_csv('data/processed/studio.csv')
         # populate mapping
         mapping: List[MappingResult] = []
@@ -66,30 +67,19 @@ class Controller():
         studio_id = request.args.get('studio_id')
         if studio_id is None:
             raise Exception('Value of studio_id missing in the query parameter.')
-        # download file
-        helper = Helper()
-        try:
-            helper.delete_file('data/raw/' + Config.DATALAKE_LOCATION.replace('/', '_') + '.csv')
-        except:
-            # Ignore
-            pass
-        helper.download_files_as_one(Config.AWS_S3_BUCKET_DATALAKE, Config.DATALAKE_LOCATION)
-        # read file
-        data = pd.read_csv(
-            'data/raw/' + Config.DATALAKE_LOCATION.replace('/', '_') + '.csv',
-            usecols = ['STUDIOID', 'LOCATIONID', 'LOCATIONNAME'],
-            index_col = False
-        )
-        data = data[data['STUDIOID'] > 0]
-        data = data[data['STUDIOID'] == int(studio_id)]
+        # download and read data
+        DataLocation().preprocess(True)
+        data = pd.read_csv('data/processed/location.csv')
+        # filter data
+        data = data[data['studio_id'] == int(studio_id)]
         if (len(data) == 0):
             raise Exception(f'No data found for studio_id {studio_id}.')
         # populate mapping
         mapping: List[MappingResult] = []
         for _, row in data.iterrows():
             mapping.append({
-                'id': row['LOCATIONID'],
-                'value': row['LOCATIONNAME']
+                'id': row['id'],
+                'value': row['name']
             })
         return sorted(mapping, key=lambda x: x["id"])
 
