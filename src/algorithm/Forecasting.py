@@ -1,6 +1,6 @@
 from typing import List
 from datetime import datetime, timedelta
-from src.data.DataForecast import DataForecast
+from src.data.DataDemand import DataDemand
 from src.entities.Result import ForecastResult
 from src.entities.Constant import Constant
 from prophet import Prophet
@@ -49,7 +49,7 @@ class Forecast():
 
     def _get_data(self) -> pd.DataFrame:
         # fetch and preprocess data
-        DataForecast().preprocess(self._force_fetch)
+        DataDemand().preprocess(self._force_fetch)
         # import data
         data = pd.read_csv('data/processed/demand.csv')
         # filter by studio
