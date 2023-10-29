@@ -57,7 +57,8 @@ class Forecast():
         if (len(data) == 0):
             raise Exception(f'No data found for studio "{self._studio_id}".')
         # filter by program and location
-        data = data[data['group'] == str(f'{self._get_program_by_id(self._program_id)}-{self._location_id}')]
+        data = data[data['location'] == int(self._location_id)]
+        data = data[data['program'] == int(self._program_id)]
         if (len(data) == 0):
             raise Exception(f'No data found for program "{self._program_id}" in location "{self._location_id}".')
         # get only required columns

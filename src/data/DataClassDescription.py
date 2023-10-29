@@ -74,8 +74,13 @@ class DataClassDesc:
         self._csv.loc[self._csv['name'].str.contains('bunsguns', case = False), 'name'] = 'bunsguns'
         # if classname has substring of 'training', replace as 'training' only
         self._csv.loc[self._csv['name'].str.contains('training', case = False), 'name'] = 'training'
-        # if classname is not one of the allowed values, change to NaN
+        # if classname is not one of the allowed values, change to NaN and drop
         self._csv.loc[~self._csv['name'].isin(self._program_list), 'name'] = np.nan
+        self._csv = self._csv.dropna()
+        # use id for program instead of name
+        name_mapping = {value: index for index, value in enumerate(self._program_list)}
+        self._csv['name'] = self._csv['name'].replace(name_mapping)
+        self._csv['name'] = self._csv['name'].astype(int)
         # save
         self._csv.to_csv('data/processed/class_description.csv', index=False, quoting=csv.QUOTE_NONNUMERIC)
 

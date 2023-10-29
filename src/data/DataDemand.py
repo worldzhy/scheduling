@@ -64,8 +64,10 @@ class DataDemand:
         self._class_csv.drop(columns=['capacity', 'waitlist'], inplace = True)
         # create group column
         self._class_csv['location_str'] = self._class_csv['location'].astype(str) 
-        self._class_csv['group'] = self._class_csv['program'] + '-' + self._class_csv['location_str']
+        self._class_csv['program_str'] = self._class_csv['program'].astype(str) 
+        self._class_csv['group'] = self._class_csv['program_str'] + '-' + self._class_csv['location_str']
         self._class_csv.drop(columns=['location_str'], inplace = True)
+        self._class_csv.drop(columns=['program_str'], inplace = True)
         # group by the 'date' and 'group' column and calculate the average of 'demand'
         self._class_csv = self._class_csv.groupby(['date', 'group']).agg({
             'studio': 'first',  # agregate by taking the first value
@@ -74,6 +76,7 @@ class DataDemand:
             'day': 'first',  # agregate by taking the first value
             'demand': 'mean'  # agregate by taking the mean
         }).reset_index()
+        self._class_csv.drop(columns=['group'], inplace = True)
         # save processed data
         self._class_csv.to_csv('data/processed/demand.csv', index=False, quoting=csv.QUOTE_NONNUMERIC)
 
