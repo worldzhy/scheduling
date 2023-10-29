@@ -1,14 +1,10 @@
 # type: ignore
 import pandas as pd
-import numpy as np
 import csv
 
 from ..data.DataClass import DataClass
 from ..data.DataClassDescription import DataClassDesc
-from ..entities.Config import Config
-from ..entities.S3 import S3
 from ..entities.Helper import Helper
-from ..entities.Constant import Constant
 
 class DataDemand:
     def __init__(self):
@@ -36,8 +32,8 @@ class DataDemand:
             pass
 
     def _download(self):
-        self._data_class.preprocess()
-        self._data_class_desc.preprocess()
+        self._data_class.preprocess(force_fetch=True)
+        self._data_class_desc.preprocess(force_fetch=True)
 
     def _is_processed(self):
         return self._helper.is_file_present('data/processed', 'demand.csv')
@@ -45,25 +41,31 @@ class DataDemand:
     def _read(self):
         self._class_csv = pd.read_csv(
             'data/processed/' + self._class_file_prefix.replace('/', '_') + '.csv',
-            names = ['date', 'studio', 'location', 'program', 'day', 'demand', 'group'],
             index_col = False
         )
         self._class_desc_csv = pd.read_csv(
             'data/processed/' + self._class_desc_file_prefix.replace('/', '_') + '.csv',
-            names = ['classid', 'classname'],
             index_col = False
         )
 
     def _clean(self):
-        # add program column    
-        self._class_csv = self._class_csv.merge(pd.read_csv('data/processed/' +  self._class_desc_file_prefix + '.csv'), on = 'classid', how = 'left')
-        self._class_csv.rename(
-            columns = { 'classname': 'program' },
+        # rename class description columns
+        self._class_desc_csv.rename(
+            columns = {
+                'id': 'classid',
+                'name': 'program',
+            },
             inplace = True
         )
+        # add program column    
+        self._class_csv = self._class_csv.merge(self._class_desc_csv, on = 'classid', how = 'left')
         # create demand column
         self._class_csv['demand'] = self._class_csv['capacity'] + self._class_csv['waitlist']
         self._class_csv.drop(columns=['capacity', 'waitlist'], inplace = True)
+        # create group column
+        self._class_csv['location_str'] = self._class_csv['location'].astype(str) 
+        self._class_csv['group'] = self._class_csv['program'] + '-' + self._class_csv['location_str']
+        self._class_csv.drop(columns=['location_str'], inplace = True)
         # group by the 'date' and 'group' column and calculate the average of 'demand'
         self._class_csv = self._class_csv.groupby(['date', 'group']).agg({
             'studio': 'first',  # agregate by taking the first value

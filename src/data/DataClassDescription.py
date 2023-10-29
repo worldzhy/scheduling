@@ -1,5 +1,6 @@
 # type: ignore
 import pandas as pd
+import numpy as np
 import csv
 from ..entities.Config import Config
 from ..entities.S3 import S3

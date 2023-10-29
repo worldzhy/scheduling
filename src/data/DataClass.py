@@ -77,14 +77,18 @@ class DataClass:
         self._csv['location'] = self._csv['location'].astype(int)
         # studio should be an integer
         self._csv['studio'] = self._csv['studio'].astype(int)
+        # classid should be an integer
+        self._csv['classid'] = self._csv['classid'].astype(int)
+        # capacity should be an integer
+        self._csv['capacity'] = self._csv['capacity'].astype(int)
+        # waitlist should be an integer
+        self._csv['waitlist'] = self._csv['waitlist'].astype(int)
         # drop coach for now (not part of the independent variable)
         self._csv.drop(columns = ['coach'], inplace = True)
         # remove rows with NA
         self._csv = self._csv.dropna()
         # rearrange columns
-        self._csv = self._csv[['date', 'studio', 'location', 'program', 'day', 'demand']]
-        # create new column called group
-        self._csv['group'] = self._csv['program'] + '-' + self._csv['location']
+        self._csv = self._csv[['date', 'studio', 'location', 'day', 'classid', 'capacity', 'waitlist']]
         # save processed data
         self._csv.to_csv('data/processed/class.csv', index=False, quoting=csv.QUOTE_NONNUMERIC)
 
