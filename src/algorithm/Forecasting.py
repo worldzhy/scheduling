@@ -51,7 +51,7 @@ class Forecast():
         # fetch and preprocess data
         DataDemand().preprocess(self._force_fetch)
         # import data
-        data = pd.read_csv('data/processed/demand.csv')
+        data = pd.read_csv(Constant.PATH_PROCESSED + Constant.CSV_DEMAND)
         # filter by studio
         data = data[data['studio_id'] == int(self._studio_id)]
         if (len(data) == 0):
