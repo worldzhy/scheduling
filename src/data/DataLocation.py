@@ -18,7 +18,7 @@ class DataLocation:
     
     def _clean_raw_files(self):
         try:
-            self._helper.delete_file('data/raw/' + self._file_prefix.replace('/', '_') + '.csv')
+            self._helper.delete_file(Constant.PATH_RAW + self._file_prefix.replace('/', '_') + '.csv')
         except:
             # ignore
             pass
@@ -27,11 +27,11 @@ class DataLocation:
         self._helper.download_files_as_one(self._bucket, self._file_prefix)
 
     def _is_processed(self):
-        return self._helper.is_file_present('data/processed', 'location.csv')
+        return self._helper.is_file_present('data/processed/', 'location.csv')
 
     def _read(self):
         self._csv = pd.read_csv(
-            'data/raw/' + self._file_prefix.replace('/', '_') + '.csv',
+            Constant.PATH_RAW + self._file_prefix.replace('/', '_') + '.csv',
             usecols = ['STUDIOID', 'LOCATIONID', 'LOCATIONNAME'],
             index_col = False
         )

@@ -23,3 +23,12 @@ class Constant:
     PROGRAM_LIST = ['30minexpress', 'advanced', 'armsabs', 'beginner', 'bunsabs', 'bunsguns', 'training', 'foundations', 'fullbody']
     # month list
     MONTH_LIST = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    # paths
+    PATH_RAW = 'data/raw/'
+    PATH_PROCESSED = 'data/processed/'
+    # csv filenames
+    CSV_CLASS = 'class.csv'
+    CSV_CLASS_DESC = 'class_description.csv'
+    CSV_DEMAND = 'demand.csv'
+    CSV_LOCATION = 'location.csv'
+    CSV_STUDIO = 'studio.csv'

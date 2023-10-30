@@ -19,7 +19,7 @@ class DataClassDesc:
     
     def _clean_raw_files(self):
         try:
-            self._helper.delete_file('data/raw/' + self._file_prefix.replace('/', '_') + '.csv')
+            self._helper.delete_file(Constant.PATH_RAW + self._file_prefix.replace('/', '_') + '.csv')
         except:
             # ignore
             pass
@@ -32,7 +32,7 @@ class DataClassDesc:
 
     def _read(self):
         self._csv = pd.read_csv(
-            'data/raw/' + self._file_prefix.replace('/', '_') + '.csv',
+            Constant.PATH_RAW + self._file_prefix.replace('/', '_') + '.csv',
             usecols = ['CLASSID', 'CLASSNAME'],
             index_col = False
         )

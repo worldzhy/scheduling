@@ -20,7 +20,7 @@ class DataClass:
     
     def _clean_raw_files(self):
         try:
-            self._helper.delete_file('data/raw/' + self._file_prefix.replace('/', '_') + '.csv')
+            self._helper.delete_file(Constant.PATH_RAW + self._file_prefix.replace('/', '_') + '.csv')
         except:
             # ignore
             pass
@@ -33,7 +33,7 @@ class DataClass:
 
     def _read(self):
         self._csv = pd.read_csv(
-            'data/raw/' + self._file_prefix.replace('/', '_') + '.csv',
+            Constant.PATH_RAW + self._file_prefix.replace('/', '_') + '.csv',
             names = ["CLASSSTARTTIME","CLASSENDTIME","CLASSDATESTART","CLASSDATEEND","CLASSUPDATED","CREATIONDATETIME","LASTMODIFIEDON","CREATEDDATETIMEUTC","MODIFIEDDATETIMEUTC","STUDIOID","CLASSID","SUBCLASSID","DESCRIPTIONID","CLASSTRAINERID","LOCATIONID","PAYSCALEID","CLASSCAPACITY","MAXCAPACITY","TRAINERID2","TRAINERID3","WAITLISTSIZE","EMPID","COURSEID","SEMESTERID","ENROLLEDRESERVED","DROPINRESERVED","CREATEDBY","LASTMODIFIEDBY","BATCHKEY","DAYSUNDAY","DAYMONDAY","DAYTUESDAY","DAYWEDNESDAY","DAYTHURSDAY","DAYFRIDAY","DAYSATURDAY","CLASSACTIVE","NOLOC","FREE","PMTPLAN","USELEADFOLLOWSPLIT","MASKTRAINER","ALLOWUNPAIDS","ALLOWOPENENROLLMENT","TRPAYSASST1","TRPAYSASST2","ALLOWDATEFORWARDENROLLMENT","RECURRING","SOFTDELETED","LOADEDDATETIMEUTC"],
             usecols = ['CLASSDATESTART', 'LOCATIONID', 'CLASSID', 'STUDIOID', 'CLASSTRAINERID', 'CLASSCAPACITY', 'WAITLISTSIZE', 'DAYSUNDAY', 'DAYMONDAY', 'DAYTUESDAY', 'DAYWEDNESDAY', 'DAYTHURSDAY', 'DAYFRIDAY', 'DAYSATURDAY'],
             index_col = False
@@ -90,7 +90,7 @@ class DataClass:
         # rearrange columns
         self._csv = self._csv[['date', 'studio_id', 'location_id', 'day', 'id', 'capacity', 'waitlist']]
         # save processed data
-        self._csv.to_csv('data/processed/class.csv', index=False, quoting=csv.QUOTE_NONNUMERIC)
+        self._csv.to_csv(Constant.PATH_PROCESSED + Constant.CSV_CLASS, index=False, quoting=csv.QUOTE_NONNUMERIC)
 
     def preprocess(self, force_fetch: bool):
         if force_fetch or self._is_processed() == False:
