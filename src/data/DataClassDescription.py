@@ -42,45 +42,45 @@ class DataClassDesc:
         self._csv.rename(
             columns = {
                 'CLASSID': 'id',
-                'CLASSNAME': 'name',
+                'CLASSNAME': 'program_id',
             },
             inplace = True
         )
         # drop columns with NA
         self._csv = self._csv.dropna()
         # lower case all
-        self._csv['name'] = self._csv['name'].str.lower()
+        self._csv['program_id'] = self._csv['program_id'].str.lower()
         # remove all spaces
-        self._csv['name'] = self._csv['name'].str.replace(r'\s', '', case = False, regex = True)
+        self._csv['program_id'] = self._csv['program_id'].str.replace(r'\s', '', case = False, regex = True)
         # remove all symbols
-        self._csv['name'] = self._csv['name'].str.replace(r'[^\w\s]', '', case = False, regex = True)
+        self._csv['program_id'] = self._csv['program_id'].str.replace(r'[^\w\s]', '', case = False, regex = True)
         # remove 'and' word
-        self._csv['name'] = self._csv['name'].str.replace(r'and', '', case = False, regex = False)
+        self._csv['program_id'] = self._csv['program_id'].str.replace(r'and', '', case = False, regex = False)
         # if classname has substring of 'fullbody', replace as 'fullbody' only
-        self._csv.loc[self._csv['name'].str.contains('fullbody', case = False), 'name'] = 'fullbody'
+        self._csv.loc[self._csv['program_id'].str.contains('fullbody', case = False), 'program_id'] = 'fullbody'
         # if classname has substring of 'express', replace as '30minexpress' only
-        self._csv.loc[self._csv['name'].str.contains('express', case = False), 'name'] = '30minexpress'
+        self._csv.loc[self._csv['program_id'].str.contains('express', case = False), 'program_id'] = '30minexpress'
         # if classname has substring of 'foundation', replace as 'foundations' only
-        self._csv.loc[self._csv['name'].str.contains('foundation', case = False), 'name'] = 'foundations'
+        self._csv.loc[self._csv['program_id'].str.contains('foundation', case = False), 'program_id'] = 'foundations'
         # if classname has substring of 'advance', replace as 'advanced' only
-        self._csv.loc[self._csv['name'].str.contains('advance', case = False), 'name'] = 'advanced'
+        self._csv.loc[self._csv['program_id'].str.contains('advance', case = False), 'program_id'] = 'advanced'
         # if classname has substring of 'beginner', replace as 'beginner' only
-        self._csv.loc[self._csv['name'].str.contains('beginner', case = False), 'name'] = 'beginner'
+        self._csv.loc[self._csv['program_id'].str.contains('beginner', case = False), 'program_id'] = 'beginner'
         # if classname has substring of 'armsabs', replace as 'armsabs' only
-        self._csv.loc[self._csv['name'].str.contains('armsabs', case = False), 'name'] = 'armsabs'
+        self._csv.loc[self._csv['program_id'].str.contains('armsabs', case = False), 'program_id'] = 'armsabs'
         # if classname has substring of 'bunsabs', replace as 'bunsabs' only
-        self._csv.loc[self._csv['name'].str.contains('bunsabs', case = False), 'name'] = 'bunsabs'
+        self._csv.loc[self._csv['program_id'].str.contains('bunsabs', case = False), 'program_id'] = 'bunsabs'
         # if classname has substring of 'bunsguns', replace as 'bunsguns' only
-        self._csv.loc[self._csv['name'].str.contains('bunsguns', case = False), 'name'] = 'bunsguns'
+        self._csv.loc[self._csv['program_id'].str.contains('bunsguns', case = False), 'program_id'] = 'bunsguns'
         # if classname has substring of 'training', replace as 'training' only
-        self._csv.loc[self._csv['name'].str.contains('training', case = False), 'name'] = 'training'
+        self._csv.loc[self._csv['program_id'].str.contains('training', case = False), 'program_id'] = 'training'
         # if classname is not one of the allowed values, change to NaN and drop
-        self._csv.loc[~self._csv['name'].isin(self._program_list), 'name'] = np.nan
+        self._csv.loc[~self._csv['program_id'].isin(self._program_list), 'program_id'] = np.nan
         self._csv = self._csv.dropna()
         # use id for program instead of name
         name_mapping = {value: index for index, value in enumerate(self._program_list)}
-        self._csv['name'] = self._csv['name'].replace(name_mapping)
-        self._csv['name'] = self._csv['name'].astype(int)
+        self._csv['program_id'] = self._csv['program_id'].replace(name_mapping)
+        self._csv['program_id'] = self._csv['program_id'].astype(int)
         # save
         self._csv.to_csv('data/processed/class_description.csv', index=False, quoting=csv.QUOTE_NONNUMERIC)
 

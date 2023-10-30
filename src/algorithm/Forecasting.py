@@ -53,12 +53,12 @@ class Forecast():
         # import data
         data = pd.read_csv('data/processed/demand.csv')
         # filter by studio
-        data = data[data['studio'] == int(self._studio_id)]
+        data = data[data['studio_id'] == int(self._studio_id)]
         if (len(data) == 0):
             raise Exception(f'No data found for studio "{self._studio_id}".')
         # filter by program and location
-        data = data[data['location'] == int(self._location_id)]
-        data = data[data['program'] == int(self._program_id)]
+        data = data[data['location_id'] == int(self._location_id)]
+        data = data[data['program_id'] == int(self._program_id)]
         if (len(data) == 0):
             raise Exception(f'No data found for program "{self._program_id}" in location "{self._location_id}".')
         # get only required columns

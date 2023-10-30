@@ -49,30 +49,25 @@ class DataDemand:
         )
 
     def _clean(self):
-        # rename class description columns
-        self._class_desc_csv.rename(
-            columns = {
-                'id': 'classid',
-                'name': 'program',
-            },
-            inplace = True
-        )
         # add program column    
-        self._class_csv = self._class_csv.merge(self._class_desc_csv, on = 'classid', how = 'left')
+        self._class_csv = self._class_csv.merge(self._class_desc_csv, on = 'id', how = 'left')
+        # program_id should be an integer
+        self._class_csv = self._class_csv.dropna()
+        self._class_csv['program_id'] = self._class_csv['program_id'].astype(int)
         # create demand column
         self._class_csv['demand'] = self._class_csv['capacity'] + self._class_csv['waitlist']
         self._class_csv.drop(columns=['capacity', 'waitlist'], inplace = True)
         # create group column
-        self._class_csv['location_str'] = self._class_csv['location'].astype(str) 
-        self._class_csv['program_str'] = self._class_csv['program'].astype(str) 
-        self._class_csv['group'] = self._class_csv['program_str'] + '-' + self._class_csv['location_str']
-        self._class_csv.drop(columns=['location_str'], inplace = True)
-        self._class_csv.drop(columns=['program_str'], inplace = True)
+        self._class_csv['location_id_str'] = self._class_csv['location_id'].astype(str) 
+        self._class_csv['program_id_str'] = self._class_csv['program_id'].astype(str) 
+        self._class_csv['group'] = self._class_csv['program_id_str'] + '-' + self._class_csv['location_id_str']
+        self._class_csv.drop(columns=['location_id_str'], inplace = True)
+        self._class_csv.drop(columns=['program_id_str'], inplace = True)
         # group by the 'date' and 'group' column and calculate the average of 'demand'
         self._class_csv = self._class_csv.groupby(['date', 'group']).agg({
-            'studio': 'first',  # agregate by taking the first value
-            'location': 'first',  # agregate by taking the first value
-            'program': 'first',  # agregate by taking the first value
+            'studio_id': 'first',  # agregate by taking the first value
+            'location_id': 'first',  # agregate by taking the first value
+            'program_id': 'first',  # agregate by taking the first value
             'day': 'first',  # agregate by taking the first value
             'demand': 'mean'  # agregate by taking the mean
         }).reset_index()

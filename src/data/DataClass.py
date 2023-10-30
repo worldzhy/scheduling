@@ -44,10 +44,10 @@ class DataClass:
         self._csv.rename(
             columns = {
                 'CLASSDATESTART': 'date',
-                'LOCATIONID': 'location',
-                'CLASSID': 'classid',
-                'STUDIOID': 'studio',
-                'CLASSTRAINERID': 'coach',
+                'LOCATIONID': 'location_id',
+                'CLASSID': 'id',
+                'STUDIOID': 'studio_id',
+                'CLASSTRAINERID': 'coach_id',
                 'CLASSCAPACITY': 'capacity',
                 'WAITLISTSIZE': 'waitlist',
                 'DAYSUNDAY': 'sunday',
@@ -72,23 +72,23 @@ class DataClass:
             self._csv.loc[self._csv[day], 'day'] = ind + 1
         self._csv.drop(columns = self._days_of_the_week, inplace = True)
         # location should be an integer
-        self._csv['location'] = self._csv['location'].replace([np.inf, -np.inf], np.nan)
+        self._csv['location_id'] = self._csv['location_id'].replace([np.inf, -np.inf], np.nan)
         self._csv = self._csv.dropna()
-        self._csv['location'] = self._csv['location'].astype(int)
+        self._csv['location_id'] = self._csv['location_id'].astype(int)
         # studio should be an integer
-        self._csv['studio'] = self._csv['studio'].astype(int)
+        self._csv['studio_id'] = self._csv['studio_id'].astype(int)
         # classid should be an integer
-        self._csv['classid'] = self._csv['classid'].astype(int)
+        self._csv['id'] = self._csv['id'].astype(int)
         # capacity should be an integer
         self._csv['capacity'] = self._csv['capacity'].astype(int)
         # waitlist should be an integer
         self._csv['waitlist'] = self._csv['waitlist'].astype(int)
         # drop coach for now (not part of the independent variable)
-        self._csv.drop(columns = ['coach'], inplace = True)
+        self._csv.drop(columns = ['coach_id'], inplace = True)
         # remove rows with NA
         self._csv = self._csv.dropna()
         # rearrange columns
-        self._csv = self._csv[['date', 'studio', 'location', 'day', 'classid', 'capacity', 'waitlist']]
+        self._csv = self._csv[['date', 'studio_id', 'location_id', 'day', 'id', 'capacity', 'waitlist']]
         # save processed data
         self._csv.to_csv('data/processed/class.csv', index=False, quoting=csv.QUOTE_NONNUMERIC)
 
