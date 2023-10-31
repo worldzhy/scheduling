@@ -27,8 +27,8 @@ class Constant:
     PATH_RAW = 'data/raw/'
     PATH_PROCESSED = 'data/processed/'
     # csv filenames
-    CSV_CLASS = 'class.csv'
-    CSV_CLASS_DESC = 'class_description.csv'
-    CSV_DEMAND = 'demand.csv'
-    CSV_LOCATION = 'location.csv'
-    CSV_STUDIO = 'studio.csv'
+    CSV_CLASS = PATH_PROCESSED + 'class.csv'
+    CSV_CLASS_DESC = PATH_PROCESSED + 'class_description.csv'
+    CSV_DEMAND = PATH_PROCESSED + 'demand.csv'
+    CSV_LOCATION = PATH_PROCESSED + 'location.csv'
+    CSV_STUDIO = PATH_PROCESSED + 'studio.csv'
