@@ -18,8 +18,7 @@ class Helper:
             # write the uncompressed data to the new file
             f_out.write(compressed_data)
 
-    def is_file_present(self, folder_path: str, file_name: str):
-        file_path = os.path.join(folder_path, file_name)
+    def is_file_present(self, file_path: str):
         if os.path.exists(file_path):
             return True
         else:

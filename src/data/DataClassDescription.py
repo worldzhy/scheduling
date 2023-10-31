@@ -28,7 +28,7 @@ class DataClassDesc:
         self._helper.download_files_as_one(self._bucket, self._file_prefix)
 
     def _is_processed(self):
-        return self._helper.is_file_present(Constant.PATH_PROCESSED, Constant.CSV_CLASS_DESC)
+        return self._helper.is_file_present(Constant.PATH_PROCESSED + Constant.CSV_CLASS_DESC)
 
     def _read(self):
         self._csv = pd.read_csv(

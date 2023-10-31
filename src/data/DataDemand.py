@@ -37,7 +37,7 @@ class DataDemand:
         self._data_class_desc.preprocess(force_fetch=True)
 
     def _is_processed(self):
-        return self._helper.is_file_present(Constant.PATH_PROCESSED, Constant.CSV_DEMAND)
+        return self._helper.is_file_present(Constant.PATH_PROCESSED + Constant.CSV_DEMAND)
 
     def _read(self):
         self._class_csv = pd.read_csv(

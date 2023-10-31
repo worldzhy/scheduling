@@ -29,7 +29,7 @@ class DataClass:
         self._helper.download_files_as_one(self._bucket, self._file_prefix)
 
     def _is_processed(self):
-        return self._helper.is_file_present(Constant.PATH_PROCESSED, Constant.CSV_CLASS)
+        return self._helper.is_file_present(Constant.PATH_PROCESSED + Constant.CSV_CLASS)
 
     def _read(self):
         self._csv = pd.read_csv(
