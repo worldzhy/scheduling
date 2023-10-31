@@ -24,11 +24,11 @@ class Constant:
     # month list
     MONTH_LIST = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
     # paths
-    PATH_RAW = 'data/raw/'
-    PATH_PROCESSED = 'data/processed/'
+    PATH_FOLDER_RAW = 'data/raw/'
+    PATH_FOLDER_PROCESSED = 'data/processed/'
     # csv filenames
-    CSV_CLASS = PATH_PROCESSED + 'class.csv'
-    CSV_CLASS_DESC = PATH_PROCESSED + 'class_description.csv'
-    CSV_DEMAND = PATH_PROCESSED + 'demand.csv'
-    CSV_LOCATION = PATH_PROCESSED + 'location.csv'
-    CSV_STUDIO = PATH_PROCESSED + 'studio.csv'
+    PATH_CSV_CLASS = PATH_FOLDER_PROCESSED + 'class.csv'
+    PATH_CSV_CLASS_DESC = PATH_FOLDER_PROCESSED + 'class_description.csv'
+    PATH_CSV_DEMAND = PATH_FOLDER_PROCESSED + 'demand.csv'
+    PATH_CSV_LOCATION = PATH_FOLDER_PROCESSED + 'location.csv'
+    PATH_CSV_STUDIO = PATH_FOLDER_PROCESSED + 'studio.csv'

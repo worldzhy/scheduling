@@ -59,12 +59,12 @@ class Helper:
     def download_files_as_one(self, bucket_name: str, s3_prefix: str):
         response = self._s3.get_files(bucket_name, s3_prefix)
         for obj in response.get('Contents', []):
-            local_file_path = Constant.PATH_RAW + obj['Key'].replace('/', '_')
+            local_file_path = Constant.PATH_FOLDER_RAW + obj['Key'].replace('/', '_')
             self._s3.download_file(bucket_name, obj['Key'], local_file_path)
             if (local_file_path.endswith('gz')):
                 self.uncompress_gz(local_file_path, local_file_path + '.csv')
                 self.delete_file(local_file_path)
         self.merge_csv_files(
-            folder_path = Constant.PATH_RAW,
+            folder_path = Constant.PATH_FOLDER_RAW,
             file_prefix = s3_prefix.replace('/', '_')
         )

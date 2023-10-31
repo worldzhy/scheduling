@@ -52,7 +52,7 @@ class Controller():
     def get_studio(self):
         # download and read data
         DataStudio().preprocess(True)
-        data = pd.read_csv(Constant.CSV_STUDIO)
+        data = pd.read_csv(Constant.PATH_CSV_STUDIO)
         # populate mapping
         mapping: List[MappingResult] = []
         for _, row in data.iterrows():
@@ -69,7 +69,7 @@ class Controller():
             raise Exception('Value of studio_id missing in the query parameter.')
         # download and read data
         DataLocation().preprocess(True)
-        data = pd.read_csv(Constant.CSV_LOCATION)
+        data = pd.read_csv(Constant.PATH_CSV_LOCATION)
         # filter data
         data = data[data['studio_id'] == int(studio_id)]
         if (len(data) == 0):

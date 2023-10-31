@@ -27,7 +27,7 @@ class DataDemand:
                 self._class_desc_file_prefix
             ]
             for file_prefix in file_prefixes:
-                self._helper.delete_file(Constant.PATH_PROCESSED + file_prefix.replace('/', '_') + '.csv')
+                self._helper.delete_file(Constant.PATH_FOLDER_PROCESSED + file_prefix.replace('/', '_') + '.csv')
         except:
             # ignore
             pass
@@ -37,15 +37,15 @@ class DataDemand:
         self._data_class_desc.preprocess(force_fetch=True)
 
     def _is_processed(self):
-        return self._helper.is_file_present(Constant.CSV_DEMAND)
+        return self._helper.is_file_present(Constant.PATH_CSV_DEMAND)
 
     def _read(self):
         self._class_csv = pd.read_csv(
-            Constant.PATH_PROCESSED + self._class_file_prefix.replace('/', '_') + '.csv',
+            Constant.PATH_FOLDER_PROCESSED + self._class_file_prefix.replace('/', '_') + '.csv',
             index_col = False
         )
         self._class_desc_csv = pd.read_csv(
-            Constant.PATH_PROCESSED + self._class_desc_file_prefix.replace('/', '_') + '.csv',
+            Constant.PATH_FOLDER_PROCESSED + self._class_desc_file_prefix.replace('/', '_') + '.csv',
             index_col = False
         )
 
@@ -74,7 +74,7 @@ class DataDemand:
         }).reset_index()
         self._class_csv.drop(columns=['group'], inplace = True)
         # save processed data
-        self._class_csv.to_csv(Constant.CSV_DEMAND, index=False, quoting=csv.QUOTE_NONNUMERIC)
+        self._class_csv.to_csv(Constant.PATH_CSV_DEMAND, index=False, quoting=csv.QUOTE_NONNUMERIC)
 
     def preprocess(self, force_fetch: bool):
         if force_fetch or self._is_processed() == False:
