@@ -14,7 +14,6 @@ ENV APP_DEBUG=True
 COPY . .
 
 # Install any needed packages specified in requirements.txt
-RUN pip install --upgrade pip
 RUN python -m pip cache purge
 RUN pip install -r requirements.txt --timeout 2000 --no-cache-dir
 
