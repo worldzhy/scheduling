@@ -76,10 +76,12 @@ class DataClass:
         print('>>> PRINT4', self._csv.shape[0], flush=True)
         self._csv.drop(columns = self._days_of_the_week, inplace = True)
         # location should be an integer
+        self._csv.to_csv(Constant.PATH_CSV_CLASS + '1', index=False, quoting=csv.QUOTE_NONNUMERIC)
         print('>>> PRINT5', self._csv.shape[0], flush=True)
         self._csv['location_id'] = self._csv['location_id'].replace([np.inf, -np.inf], np.nan)
         self._csv = self._csv.dropna()
         self._csv['location_id'] = self._csv['location_id'].astype(int)
+        self._csv.to_csv(Constant.PATH_CSV_CLASS + '2', index=False, quoting=csv.QUOTE_NONNUMERIC)
         print('>>> PRINT6', self._csv.shape[0], flush=True)
         # studio should be an integer
         self._csv['studio_id'] = self._csv['studio_id'].astype(int)

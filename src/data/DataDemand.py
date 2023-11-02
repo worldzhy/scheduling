@@ -79,9 +79,13 @@ class DataDemand:
     def preprocess(self, force_fetch: bool):
         if force_fetch or self._is_processed() == False:
             # download raw data
+            print(1)
             self._clean_raw_files()
+            print(2)
             self._download()
             # read data
+            print(3)
             self._read()
             # preprocess
+            print(4)
             self._clean()
