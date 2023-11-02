@@ -60,52 +60,36 @@ class DataClass:
             },
             inplace = True
         )
-        print('>>> PRINT1', self._csv.shape[0], flush=True)
         # convert the date column to datetime
         self._csv['date'] = pd.to_datetime(self._csv['date'], errors = 'coerce').dt.date
-        print('>>> PRINT2', self._csv.shape[0], flush=True)
         # clean weekdays
         for col in self._days_of_the_week:
             self._csv[col] = self._csv[col].apply(lambda x: True if str(x).lower() == 'true' else (False if str(x).lower() == 'false' else None))
         self._csv = self._csv.dropna(subset = self._days_of_the_week)
         # aggregate days in single column called day
-        print('>>> PRINT3', self._csv.shape[0], flush=True)
         self._csv['day'] = None
         for ind, day in enumerate(self._days_of_the_week):
             self._csv.loc[self._csv[day], 'day'] = ind + 1
-        print('>>> PRINT4', self._csv.shape[0], flush=True)
         self._csv.drop(columns = self._days_of_the_week, inplace = True)
         # location should be an integer
-        self._csv.to_csv(Constant.PATH_CSV_CLASS + '1', index=False, quoting=csv.QUOTE_NONNUMERIC)
-        print('>>> PRINT5', self._csv.shape[0], flush=True)
         self._csv['location_id'] = self._csv['location_id'].replace([np.inf, -np.inf], np.nan)
         self._csv = self._csv.dropna()
         self._csv['location_id'] = self._csv['location_id'].astype(int)
-        self._csv.to_csv(Constant.PATH_CSV_CLASS + '2', index=False, quoting=csv.QUOTE_NONNUMERIC)
-        print('>>> PRINT6', self._csv.shape[0], flush=True)
         # studio should be an integer
         self._csv['studio_id'] = self._csv['studio_id'].astype(int)
-        print('>>> PRINT7', self._csv.shape[0], flush=True)
         # classid should be an integer
         self._csv['id'] = self._csv['id'].astype(int)
-        print('>>> PRINT8', self._csv.shape[0], flush=True)
         # capacity should be an integer
         self._csv['capacity'] = self._csv['capacity'].astype(int)
-        print('>>> PRINT9', self._csv.shape[0], flush=True)
         # waitlist should be an integer
-        print('>>> PRINT10', self._csv.shape[0], flush=True)
         self._csv['waitlist'] = self._csv['waitlist'].astype(int)
         # drop coach for now (not part of the independent variable)
-        print('>>> PRINT11', self._csv.shape[0], flush=True)
         self._csv.drop(columns = ['coach_id'], inplace = True)
         # remove rows with NA
-        print('>>> PRINT12', self._csv.shape[0], flush=True)
         self._csv = self._csv.dropna()
         # rearrange columns
-        print('>>> PRINT13', self._csv.shape[0], flush=True)
         self._csv = self._csv[['date', 'studio_id', 'location_id', 'day', 'id', 'capacity', 'waitlist']]
         # save processed data
-        print('>>> PRINT14', self._csv.shape[0], flush=True)
         self._csv.to_csv(Constant.PATH_CSV_CLASS, index=False, quoting=csv.QUOTE_NONNUMERIC)
 
     def preprocess(self, force_fetch: bool):
