@@ -1,5 +1,5 @@
 # Build image
-docker build -t scheduling:latest .
+docker build --no-cache -t scheduling:latest .
 
 # Remove dangling images
 docker image prune -f
