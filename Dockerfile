@@ -1,5 +1,5 @@
 # Deriving the latest base image
-FROM python:3.12.0
+FROM --platform=linux/x86-64 python:3.12.0
 
 # Working directory
 WORKDIR /usr/src/app
