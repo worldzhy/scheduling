@@ -1,11 +1,11 @@
 # Deriving the latest base image
-FROM python:3.12.0-alpine
+FROM python:3.12.0
 
 # Working directory
 WORKDIR /usr/src/app
 
 # Update
-RUN apk update && apk upgrade
+RUN apt update
 
 # Environment variables
 ENV APP_DEBUG=True
