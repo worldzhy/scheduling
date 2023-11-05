@@ -1,8 +1,11 @@
 # Deriving the latest base image
-FROM --platform=linux/x86-64 python:3.12.0-slim-bullseye
+FROM python:3.12.0-slim-bullseye
 
 # Working directory
 WORKDIR /usr/src/app
+
+# Update
+RUN apt update
 
 # Environment variables
 ENV APP_DEBUG=True
