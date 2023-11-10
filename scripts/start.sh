@@ -1,5 +1,5 @@
 # Build image
-docker build --no-cache -t scheduling:latest .
+docker buildx build --platform=linux/arm64/v8 --no-cache -t scheduling:latest .
 
 # Remove dangling images
 docker image prune -f
