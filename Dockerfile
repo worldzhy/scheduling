@@ -1,5 +1,5 @@
 # Deriving the latest base image
-FROM --platform=linux/arm64/v8 python:3.12.0-slim-bullseye
+FROM --platform=linux/arm64/v8 python:3.11.5-slim-bullseye
 
 # Working directory
 WORKDIR /usr/src/app
