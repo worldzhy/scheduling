@@ -1,6 +1,6 @@
 import gzip
 import os
-import pandas as pd
+import shutil
 from .Constant import Constant
 from .S3 import S3
 
@@ -40,16 +40,12 @@ class Helper:
         files = os.listdir(folder_path)
         # filter files with the prefix and end with '.csv'
         csv_files = [file for file in files if file.startswith(file_prefix) and file.endswith('.csv')]
-        # initialize an empty list to store individual data frames
-        dfs = []
         # read and merge each CSV file into a data frame
-        for csv_file in csv_files:
-            df = pd.read_csv(os.path.join(folder_path, csv_file), on_bad_lines='skip')
-            dfs.append(df)
-        # merge all data frames into one
-        merged_df = pd.concat(dfs, ignore_index = True)
-        # save the merged data frame to a single CSV file
-        merged_df.to_csv(os.path.join(folder_path, merged_filename), index=False)
+        with open(os.path.join(folder_path, merged_filename), 'wb') as outfile:
+            for csv_file in csv_files:
+                with open(os.path.join(folder_path, csv_file), 'rb') as infile:
+                    shutil.copyfileobj(infile, outfile)
+                outfile.write(b'\n')
         # delete the individual CSV files (except the merged one)
         for csv_file in csv_files:
             file_path = os.path.join(folder_path, csv_file)
