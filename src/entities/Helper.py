@@ -1,6 +1,7 @@
 import gzip
 import os
 import shutil
+import pandas as pd
 from .Constant import Constant
 from .S3 import S3
 
@@ -64,3 +65,13 @@ class Helper:
             folder_path = Constant.PATH_FOLDER_RAW,
             file_prefix = s3_prefix.replace('/', '_')
         )
+
+    def is_time_interval_overlap(self, start_time1: str, end_time1: str, start_time2: str, end_time2: str):
+        # Convert time strings to pandas datetime objects for easy comparison
+        start_time1 = pd.to_datetime(start_time1, format="%H:%M:%S").time()
+        end_time1 = pd.to_datetime(end_time1, format="%H:%M:%S").time()
+        start_time2 = pd.to_datetime(start_time2, format="%H:%M:%S").time()
+        end_time2 = pd.to_datetime(end_time2, format="%H:%M:%S").time()
+
+        # Check if intervals overlap
+        return end_time1 > start_time2 and end_time2 > start_time1

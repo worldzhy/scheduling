@@ -16,10 +16,17 @@ def post_schedule():
     except Exception as e:
         return handle_api_error(e)
 
-@app.route('/forecast', methods=['POST'])
-def post_forecast():
+@app.route('/v1/forecast', methods=['POST'])
+def post_v1_forecast():
     try:
-        return jsonify(controller.post_forecast(request)), 200
+        return jsonify(controller.post_v1_forecast(request)), 200
+    except Exception as e:
+        return handle_api_error(e)
+    
+@app.route('/v2/forecast', methods=['POST'])
+def post_v2_forecast():
+    try:
+        return jsonify(controller.post_v2_forecast(request)), 200
     except Exception as e:
         return handle_api_error(e)
 
@@ -48,6 +55,27 @@ def get_program():
 def get_month():
     try:
         return jsonify(controller.get_month()), 200
+    except Exception as e:
+        return handle_api_error(e)
+
+@app.route('/weekday', methods=['GET'])
+def get_weekday():
+    try:
+        return jsonify(controller.get_weekday()), 200
+    except Exception as e:
+        return handle_api_error(e)
+
+@app.route('/coach_tier', methods=['GET'])
+def get_coach_tier():
+    try:
+        return jsonify(controller.get_coach_tier()), 200
+    except Exception as e:
+        return handle_api_error(e)
+
+@app.route('/timeslot', methods=['GET'])
+def get_timeslot():
+    try:
+        return jsonify(controller.get_timeslot_list()), 200
     except Exception as e:
         return handle_api_error(e)
 

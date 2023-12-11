@@ -303,3 +303,155 @@ Sample CURL:
 curl --location --request GET '{baseurl}/month' \
 --header 'Content-Type: application/json'
 ```
+
+### Weekday mapping
+
+Gives the mapping of weekday id to its string value.
+
+Endpoint:
+
+```
+GET {baseurl}/weekday
+```
+
+Sample payload: No payload
+
+Sample response:
+
+```
+[
+    {
+        "id": 0,
+        "value": "Saturday"
+    },
+    {
+        "id": 1,
+        "value": "Sunday"
+    },
+    {
+        "id": 2,
+        "value": "Monday"
+    },
+    {
+        "id": 3,
+        "value": "Tuesday"
+    },
+    {
+        "id": 4,
+        "value": "Wednesday"
+    },
+    {
+        "id": 5,
+        "value": "Thursday"
+    },
+    {
+        "id": 6,
+        "value": "Friday"
+    }
+]
+```
+
+Sample CURL:
+
+```
+curl --location '{baseUrl}/weekday'
+```
+
+### Coach tier mapping
+
+Gives the mapping of coach tier id to its string value.
+
+Endpoint:
+
+```
+GET {baseurl}/coach_tier
+```
+
+Sample payload: No payload
+
+Sample response:
+
+```
+[
+    {
+        "id": 0,
+        "value": "New"
+    },
+    {
+        "id": 1,
+        "value": "Standard"
+    },
+    {
+        "id": 2,
+        "value": "Senior"
+    },
+    {
+        "id": 3,
+        "value": "Pro"
+    },
+    {
+        "id": 4,
+        "value": "Master"
+    }
+]
+```
+
+Sample CURL:
+
+```
+curl --location '{baseUrl}/coach_tier'
+```
+
+### Timeslot mapping
+
+Gives the mapping of timeslot id to its string value.
+
+Endpoint:
+
+```
+GET {baseurl}/timeslot
+```
+
+Sample payload: No payload
+
+Sample response:
+
+```
+[
+    {
+        "id": 0,
+        "value": "05:00 AM"
+    },
+    {
+        "id": 1,
+        "value": "06:00 AM"
+    },
+    {
+        "id": 2,
+        "value": "07:00 AM"
+    },
+    {
+        "id": 3,
+        "value": "08:00 AM"
+    },
+    ...
+    {
+        "id": 15,
+        "value": "08:00 PM"
+    },
+    {
+        "id": 16,
+        "value": "09:00 PM"
+    },
+    {
+        "id": 17,
+        "value": "10:00 PM"
+    }
+]
+```
+
+Sample CURL:
+
+```
+curl --location '{baseUrl}/timeslot'
+```

@@ -23,6 +23,12 @@ class Constant:
     PROGRAM_LIST = ['30minexpress', 'advanced', 'armsabs', 'beginner', 'bunsabs', 'bunsguns', 'training', 'foundations', 'fullbody']
     # month list
     MONTH_LIST = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    # weekday list
+    WEEKDAY_LIST = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+    # coach tier list
+    COACH_TIER_LIST = ['New', 'Standard', 'Senior', 'Pro', 'Master']
+    # time list
+    TIMESLOT_LIST = ['05:00:00', '05:30:00', '06:00:00', '06:30:00', '07:00:00', '07:30:00', '08:00:00', '08:30:00', '09:00:00', '09:30:00', '10:00:00', '10:30:00', '11:00:00', '11:30:00', '12:00:00', '12:30:00', '01:00:00', '01:30:00', '02:00:00', '02:30:00', '03:00:00', '03:30:00', '04:00:00', '04:30:00', '05:00:00', '05:30:00', '06:00:00', '06:30:00', '07:00:00', '07:30:00', '08:00:00', '08:30:00', '09:00:00', '09:30:00', '10:00:00']
     # paths
     PATH_FOLDER_RAW = 'data/raw/'
     PATH_FOLDER_PROCESSED = 'data/processed/'

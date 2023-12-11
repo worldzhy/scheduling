@@ -52,6 +52,8 @@ class DataDemand:
     def _clean(self):
         # add program column    
         self._class_csv = self._class_csv.merge(self._class_desc_csv, on = 'id', how = 'left')
+        print('csv class')
+        print(self._class_csv.head())
         # program_id should be an integer
         self._class_csv = self._class_csv.dropna()
         self._class_csv['program_id'] = self._class_csv['program_id'].astype(int)
