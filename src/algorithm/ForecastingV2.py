@@ -1,7 +1,7 @@
 from typing import List
 from datetime import datetime, timedelta
 from src.entities.Helper import Helper
-from src.data.DataDemand import DataDemand
+from src.data.DataDemandV2 import DataDemand as DataDemandV2
 from src.entities.Result import ForecastResult
 from src.entities.Constant import Constant
 from prophet import Prophet
@@ -52,7 +52,7 @@ class Forecast():
 
     def _get_data(self) -> pd.DataFrame:
         # fetch and preprocess data
-        DataDemand().preprocess(self._force_fetch)
+        DataDemandV2().preprocess(self._force_fetch)
         # import data
         data = pd.read_csv(Constant.PATH_CSV_DEMAND)
         # filter by studio
