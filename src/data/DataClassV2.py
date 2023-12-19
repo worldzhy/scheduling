@@ -35,7 +35,7 @@ class DataClass:
         self._csv = pd.read_csv(
             Constant.PATH_FOLDER_RAW + self._file_prefix.replace('/', '_') + '.csv',
             names = ["CLASSSTARTTIME","CLASSENDTIME","CLASSDATESTART","CLASSDATEEND","CLASSUPDATED","CREATIONDATETIME","LASTMODIFIEDON","CREATEDDATETIMEUTC","MODIFIEDDATETIMEUTC","STUDIOID","CLASSID","SUBCLASSID","DESCRIPTIONID","CLASSTRAINERID","LOCATIONID","PAYSCALEID","CLASSCAPACITY","MAXCAPACITY","TRAINERID2","TRAINERID3","WAITLISTSIZE","EMPID","COURSEID","SEMESTERID","ENROLLEDRESERVED","DROPINRESERVED","CREATEDBY","LASTMODIFIEDBY","BATCHKEY","DAYSUNDAY","DAYMONDAY","DAYTUESDAY","DAYWEDNESDAY","DAYTHURSDAY","DAYFRIDAY","DAYSATURDAY","CLASSACTIVE","NOLOC","FREE","PMTPLAN","USELEADFOLLOWSPLIT","MASKTRAINER","ALLOWUNPAIDS","ALLOWOPENENROLLMENT","TRPAYSASST1","TRPAYSASST2","ALLOWDATEFORWARDENROLLMENT","RECURRING","SOFTDELETED","LOADEDDATETIMEUTC"],
-            usecols = ['CLASSDATESTART', 'LOCATIONID', 'CLASSID', 'STUDIOID', 'CLASSTRAINERID', 'CLASSCAPACITY', 'WAITLISTSIZE', 'DAYSUNDAY', 'DAYMONDAY', 'DAYTUESDAY', 'DAYWEDNESDAY', 'DAYTHURSDAY', 'DAYFRIDAY', 'DAYSATURDAY'],
+            usecols = ['CLASSSTARTTIME', 'CLASSENDTIME', 'CLASSDATESTART', 'LOCATIONID', 'CLASSID', 'STUDIOID', 'CLASSTRAINERID', 'CLASSCAPACITY', 'WAITLISTSIZE', 'DAYSUNDAY', 'DAYMONDAY', 'DAYTUESDAY', 'DAYWEDNESDAY', 'DAYTHURSDAY', 'DAYFRIDAY', 'DAYSATURDAY'],
             index_col = False
         )
 
@@ -44,6 +44,8 @@ class DataClass:
         self._csv.rename(
             columns = {
                 'CLASSDATESTART': 'date',
+                'CLASSSTARTTIME': 'start_time',
+                'CLASSENDTIME': 'end_time',
                 'LOCATIONID': 'location_id',
                 'CLASSID': 'id',
                 'STUDIOID': 'studio_id',
@@ -62,6 +64,9 @@ class DataClass:
         )
         # convert the date column to datetime
         self._csv['date'] = pd.to_datetime(self._csv['date'], errors = 'coerce').dt.date
+        # convert the time column to time
+        self._csv['start_time'] = pd.to_datetime(self._csv['start_time'], errors = 'coerce').dt.time
+        self._csv['end_time'] = pd.to_datetime(self._csv['end_time'], errors = 'coerce').dt.time
         # clean weekdays
         for col in self._days_of_the_week:
             self._csv[col] = self._csv[col].apply(lambda x: True if str(x).lower() == 'true' else (False if str(x).lower() == 'false' else None))
@@ -88,7 +93,7 @@ class DataClass:
         # remove rows with NA
         self._csv = self._csv.dropna()
         # rearrange columns
-        self._csv = self._csv[['date', 'studio_id', 'location_id', 'day', 'id', 'capacity', 'waitlist']]
+        self._csv = self._csv[['date', 'start_time', 'end_time', 'studio_id', 'location_id', 'day', 'id', 'capacity', 'waitlist']]
         # save processed data
         self._csv.to_csv(Constant.PATH_CSV_CLASS, index=False, quoting=csv.QUOTE_NONNUMERIC)
 

@@ -3,7 +3,7 @@ import pandas as pd
 import csv
 
 from ..entities.Constant import Constant
-from ..data.DataClass import DataClass
+from ..data.DataClassV2 import DataClass as DataClassV2
 from ..data.DataClassDescription import DataClassDesc
 from ..entities.Helper import Helper
 
@@ -16,7 +16,7 @@ class DataDemand:
         self._class_file_prefix = 'class'
         self._class_desc_file_prefix = 'class_description'
         # data dependencies
-        self._data_class = DataClass()
+        self._data_class = DataClassV2()
         self._data_class_desc = DataClassDesc()
 
     

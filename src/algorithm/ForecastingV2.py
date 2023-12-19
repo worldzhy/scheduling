@@ -67,8 +67,6 @@ class Forecast():
         # filter by time
         params_start_time = Constant.TIMESLOT_LIST[self._timeslot_start_id]
         params_end_time = Constant.TIMESLOT_LIST[self._timeslot_end_id]
-        print(params_start_time, params_end_time)
-        print(data.head())
         time_overlap_condition = data.apply(lambda row: Helper.is_time_interval_overlap(row['start_time'], row['end_time'], params_start_time, params_end_time), axis=1)
         data = data[time_overlap_condition]
         print(data.head())
