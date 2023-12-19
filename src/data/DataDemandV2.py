@@ -8,10 +8,13 @@ from ..data.DataClassDescription import DataClassDesc
 from ..entities.Helper import Helper
 
 class DataDemand:
-    def __init__(self):
+    def __init__(self, start_time: str, end_time: str):
         self._class_csv: pd.DataFrame = pd.DataFrame()
         self._class_desc_csv: pd.DataFrame = pd.DataFrame()
         self._helper = Helper()
+        # inputs
+        self._start_time = start_time
+        self._end_time = end_time
         # data
         self._class_file_prefix = 'class'
         self._class_desc_file_prefix = 'class_description'
@@ -52,6 +55,9 @@ class DataDemand:
     def _clean(self):
         # add program column    
         self._class_csv = self._class_csv.merge(self._class_desc_csv, on = 'id', how = 'left')
+        # filter time (TO DO: Transfer data filterings from ForecastingV2.py to here)
+        time_overlap_condition = self._class_csv.apply(lambda row: self._helper.is_time_interval_overlap(row['start_time'], row['end_time'], self._start_time, self._end_time), axis=1)
+        self._class_csv = self._class_csv[time_overlap_condition]
         # program_id should be an integer
         self._class_csv = self._class_csv.dropna()
         self._class_csv['program_id'] = self._class_csv['program_id'].astype(int)

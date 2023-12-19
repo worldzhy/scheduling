@@ -1,6 +1,5 @@
 from typing import List
 from datetime import datetime, timedelta
-from src.entities.Helper import Helper
 from src.data.DataDemandV2 import DataDemand as DataDemandV2
 from src.entities.Result import ForecastResult
 from src.entities.Constant import Constant
@@ -52,7 +51,9 @@ class Forecast():
 
     def _get_data(self) -> pd.DataFrame:
         # fetch and preprocess data
-        DataDemandV2().preprocess(self._force_fetch)
+        params_start_time = Constant.TIMESLOT_LIST[self._timeslot_start_id]
+        params_end_time = Constant.TIMESLOT_LIST[self._timeslot_end_id]
+        DataDemandV2(params_start_time, params_end_time).preprocess(self._force_fetch)
         # import data
         data = pd.read_csv(Constant.PATH_CSV_DEMAND)
         # filter by studio
@@ -64,12 +65,6 @@ class Forecast():
         data = data[data['program_id'] == int(self._program_id)]
         if (len(data) == 0):
             raise Exception(f'No data found for program "{self._program_id}" in location "{self._location_id}".')
-        # filter by time
-        params_start_time = Constant.TIMESLOT_LIST[self._timeslot_start_id]
-        params_end_time = Constant.TIMESLOT_LIST[self._timeslot_end_id]
-        time_overlap_condition = data.apply(lambda row: Helper.is_time_interval_overlap(row['start_time'], row['end_time'], params_start_time, params_end_time), axis=1)
-        data = data[time_overlap_condition]
-        print(data.head())
         # get only required columns
         data = data[['date', 'demand', 'day']]
         data.columns = ['ds', 'y', 'day']
