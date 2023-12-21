@@ -53,18 +53,9 @@ class Forecast():
         # fetch and preprocess data
         params_start_time = Constant.TIMESLOT_LIST[self._timeslot_start_id]
         params_end_time = Constant.TIMESLOT_LIST[self._timeslot_end_id]
-        DataDemandV2(params_start_time, params_end_time).preprocess(self._force_fetch)
+        DataDemandV2(params_start_time, params_end_time, self._studio_id, self._location_id, self._program_id).preprocess(self._force_fetch)
         # import data
         data = pd.read_csv(Constant.PATH_CSV_DEMAND)
-        # filter by studio
-        data = data[data['studio_id'] == int(self._studio_id)]
-        if (len(data) == 0):
-            raise Exception(f'No data found for studio "{self._studio_id}".')
-        # filter by program and location
-        data = data[data['location_id'] == int(self._location_id)]
-        data = data[data['program_id'] == int(self._program_id)]
-        if (len(data) == 0):
-            raise Exception(f'No data found for program "{self._program_id}" in location "{self._location_id}".')
         # get only required columns
         data = data[['date', 'demand', 'day']]
         data.columns = ['ds', 'y', 'day']

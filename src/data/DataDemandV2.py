@@ -8,13 +8,16 @@ from ..data.DataClassDescription import DataClassDesc
 from ..entities.Helper import Helper
 
 class DataDemand:
-    def __init__(self, start_time: str, end_time: str):
+    def __init__(self, start_time: str, end_time: str, studio_id: int, location_id: int, program_id: int):
         self._class_csv: pd.DataFrame = pd.DataFrame()
         self._class_desc_csv: pd.DataFrame = pd.DataFrame()
         self._helper = Helper()
         # inputs
         self._start_time = start_time
         self._end_time = end_time
+        self._studio_id = studio_id
+        self._location_id = location_id
+        self._program_id = program_id
         # data
         self._class_file_prefix = 'class'
         self._class_desc_file_prefix = 'class_description'
@@ -55,27 +58,37 @@ class DataDemand:
     def _clean(self):
         # add program column    
         self._class_csv = self._class_csv.merge(self._class_desc_csv, on = 'id', how = 'left')
-        # filter time (TO DO: Transfer data filterings from ForecastingV2.py to here)
+        # remove na
+        self._class_csv = self._class_csv.dropna()
+        # program_id should be an integer
+        self._class_csv['program_id'] = self._class_csv['program_id'].astype(int)
+        # filter by time
         time_overlap_condition = self._class_csv.apply(lambda row: self._helper.is_time_interval_overlap(row['start_time'], row['end_time'], self._start_time, self._end_time), axis=1)
         self._class_csv = self._class_csv[time_overlap_condition]
-        # program_id should be an integer
-        self._class_csv = self._class_csv.dropna()
-        self._class_csv['program_id'] = self._class_csv['program_id'].astype(int)
+        self._class_csv.drop(columns=['start_time', 'end_time'], inplace = True)
+        # filter by studio
+        self._class_csv = self._class_csv[self._class_csv['studio_id'] == int(self._studio_id)]
+        # filter by program
+        self._class_csv = self._class_csv[self._class_csv['location_id'] == int(self._location_id)]
+        # filter by location
+        self._class_csv = self._class_csv[self._class_csv['program_id'] == int(self._program_id)]
+        if (len(self._class_csv) == 0):
+            raise Exception(f'No data found for program "{self._program_id}" in studio "{self._studio_id}" and location "{self._location_id}".')
         # create demand column
         self._class_csv['demand'] = self._class_csv['capacity'] + self._class_csv['waitlist']
         self._class_csv.drop(columns=['capacity', 'waitlist'], inplace = True)
-        # create group column
+        # create group column (needed for aggregation, otherwise it will error out as the aggregation method will create new column using the group by params, but this will cause conflict with the existing columns)
+        self._class_csv['studio_id_str'] = self._class_csv['studio_id'].astype(str) 
         self._class_csv['location_id_str'] = self._class_csv['location_id'].astype(str) 
         self._class_csv['program_id_str'] = self._class_csv['program_id'].astype(str) 
-        self._class_csv['group'] = self._class_csv['program_id_str'] + '-' + self._class_csv['location_id_str']
-        self._class_csv.drop(columns=['location_id_str'], inplace = True)
-        self._class_csv.drop(columns=['program_id_str'], inplace = True)
+        self._class_csv['group'] = self._class_csv['studio_id_str'] + '-' + self._class_csv['program_id_str'] + '-' + self._class_csv['location_id_str']
+        self._class_csv.drop(columns=['studio_id_str', 'location_id_str', 'program_id_str'], inplace = True)
         # group by the 'date' and 'group' column and calculate the average of 'demand'
         self._class_csv = self._class_csv.groupby(['date', 'group']).agg({
             'studio_id': 'first',  # agregate by taking the first value
             'location_id': 'first',  # agregate by taking the first value
             'program_id': 'first',  # agregate by taking the first value
-            'day': 'first',  # agregate by taking the first value
+            'day': 'first',  # agregate by taking the first  (should not be harmful as day relates to date)
             'demand': 'mean'  # agregate by taking the mean
         }).reset_index()
         self._class_csv.drop(columns=['group'], inplace = True)
