@@ -38,12 +38,12 @@ class DataDemand:
             # ignore
             pass
 
-    def _download(self):
-        self._data_class.preprocess(force_fetch=True)
-        self._data_class_desc.preprocess(force_fetch=True)
+    def _download(self, force_fetch: bool):
+        self._data_class.preprocess(force_fetch=force_fetch)
+        self._data_class_desc.preprocess(force_fetch=force_fetch)
 
-    def _is_processed(self):
-        return self._helper.is_file_present(Constant.PATH_CSV_DEMAND)
+    def _is_downloaded(self):
+        return self._data_class._is_downloaded() and self._data_class_desc._is_downloaded()
 
     def _read(self):
         self._class_csv = pd.read_csv(
@@ -96,11 +96,11 @@ class DataDemand:
         self._class_csv.to_csv(Constant.PATH_CSV_DEMAND, index=False, quoting=csv.QUOTE_NONNUMERIC)
 
     def preprocess(self, force_fetch: bool):
-        if force_fetch or self._is_processed() == False:
+        if force_fetch or self._is_downloaded() == False:
             # download raw data
             self._clean_raw_files()
-            self._download()
-            # read data
-            self._read()
-            # preprocess
-            self._clean()
+            self._download(force_fetch)
+        # read data
+        self._read()
+        # preprocess
+        self._clean()

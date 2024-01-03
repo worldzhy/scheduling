@@ -28,8 +28,8 @@ class DataClass:
     def _download(self):
         self._helper.download_files_as_one(self._bucket, self._file_prefix)
 
-    def _is_processed(self):
-        return self._helper.is_file_present(Constant.PATH_CSV_CLASS)
+    def _is_downloaded(self):
+        return self._helper.is_file_present(Constant.PATH_FOLDER_RAW + self._file_prefix.replace('/', '_') + '.csv')
 
     def _read(self):
         self._csv = pd.read_csv(
@@ -93,11 +93,11 @@ class DataClass:
         self._csv.to_csv(Constant.PATH_CSV_CLASS, index=False, quoting=csv.QUOTE_NONNUMERIC)
 
     def preprocess(self, force_fetch: bool):
-        if force_fetch or self._is_processed() == False:
+        if force_fetch or self._is_downloaded() == False:
             # download raw data
             self._clean_raw_files()
             self._download()
-            # read data
-            self._read()
-            # preprocess
-            self._clean()
+        # read data
+        self._read()
+        # preprocess
+        self._clean()
